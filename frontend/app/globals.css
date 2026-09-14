@@ -1,0 +1,325 @@
+:root {
+  --bg: #fbfaf7;
+  --panel: #ffffff;
+  --ink: #1c1a17;
+  --ink-muted: #6b6558;
+  --brass: #a9793d;
+  --brass-dark: #8a6230;
+  --navy: #21304a;
+  --line: #e4dfd3;
+  --line-strong: #cfc8b8;
+  --error: #a3341f;
+
+  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: var(--bg);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 1.15;
+  margin: 0 0 0.5em;
+  letter-spacing: -0.01em;
+}
+
+h1 { font-size: clamp(2.25rem, 4vw, 3.25rem); }
+h2 { font-size: clamp(1.5rem, 2.5vw, 2rem); }
+h3 { font-size: 1.15rem; font-weight: 600; }
+
+p { color: var(--ink-muted); }
+
+a {
+  color: var(--navy);
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+
+/* ---------- Header ---------- */
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.4rem 2.5rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.3rem;
+  color: var(--ink);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+
+.site-header nav {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.site-header nav a {
+  color: var(--ink-muted);
+  text-decoration: none;
+  font-size: 0.95rem;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.site-header nav a:hover {
+  color: var(--ink);
+  border-color: var(--brass);
+}
+
+/* ---------- Layout shell ---------- */
+
+.site-main {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 3rem 2.5rem 5rem;
+}
+
+.site-footer {
+  border-top: 1px solid var(--line);
+  padding: 2.5rem;
+  text-align: left;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+}
+
+/* ---------- Hero ---------- */
+
+.hero {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 3.5rem;
+  align-items: center;
+  padding-bottom: 3.5rem;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 3.5rem;
+}
+
+.hero h1 {
+  max-width: 12ch;
+}
+
+.hero p.lede {
+  color: var(--ink-muted);
+  font-size: 1.1rem;
+  max-width: 46ch;
+  margin-bottom: 1.75rem;
+}
+
+.hero-cta {
+  display: inline-block;
+}
+
+/* Fabric-swatch grid used as the hero visual, in lieu of stock photography */
+.swatch-mosaic {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  aspect-ratio: 1;
+}
+
+.swatch-mosaic span {
+  border-radius: 2px;
+}
+
+/* ---------- Process steps ---------- */
+
+.process {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.process-step {
+  border-top: 2px solid var(--brass);
+  padding-top: 0.9rem;
+}
+
+.process-step .step-number {
+  font-family: var(--font-display);
+  color: var(--brass);
+  font-size: 1.1rem;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.process-step h3 {
+  margin-bottom: 0.3rem;
+}
+
+.process-step p {
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* ---------- Product grid & cards ---------- */
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 1.5rem;
+}
+
+.section-heading p {
+  margin: 0;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.card {
+  background: var(--panel);
+  padding: 1.25rem;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s ease;
+}
+
+.card:hover {
+  background: #f6f3ec;
+}
+
+.card img {
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+  background: var(--line);
+  margin-bottom: 0.9rem;
+}
+
+.card h3 {
+  margin-bottom: 0.3rem;
+}
+
+.card .price {
+  color: var(--brass-dark);
+  font-weight: 600;
+}
+
+/* ---------- Material swatches ---------- */
+
+.swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 0.75rem;
+  margin: 1.25rem 0 2rem;
+}
+
+.swatch {
+  border: 1px solid var(--line);
+  padding: 0.5rem;
+  cursor: pointer;
+  text-align: left;
+  background: var(--panel);
+  transition: border-color 0.15s ease;
+}
+
+.swatch.selected {
+  border-color: var(--brass);
+  border-width: 2px;
+}
+
+.swatch-color {
+  width: 100%;
+  height: 48px;
+  margin-bottom: 0.5rem;
+}
+
+.swatch small {
+  color: var(--ink-muted);
+}
+
+/* ---------- Forms ---------- */
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  max-width: 420px;
+}
+
+input,
+select {
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--line-strong);
+  background: var(--panel);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--ink);
+}
+
+input::placeholder {
+  color: #a39c8c;
+}
+
+button {
+  padding: 0.7rem 1.4rem;
+  background: var(--ink);
+  color: var(--panel);
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-family: var(--font-body);
+  width: fit-content;
+  transition: background 0.15s ease;
+}
+
+button:hover:not(:disabled) {
+  background: var(--navy);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---------- Misc ---------- */
+
+.price-box {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  margin: 1.25rem 0;
+}
+
+.error {
+  color: var(--error);
+  font-size: 0.9rem;
+}

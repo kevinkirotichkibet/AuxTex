@@ -1,0 +1,40 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: auxtexfit-mongo
+    restart: unless-stopped
+    ports:
+      - "27020:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  backend:
+    build:
+      context: ./backend
+    container_name: auxtexfit-backend
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/auxtexfit
+      JWT_SECRET: change-this-secret
+      PORT: 4000
+    ports:
+      - "4010:4000"
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Browser-facing URL — the browser runs on your host machine, not
+        # inside the Docker network, so this must be localhost, not "backend".
+        NEXT_PUBLIC_API_URL: http://localhost:4010/api
+    container_name: auxtexfit-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3010:3000"
+
+volumes:
+  mongo-data:
