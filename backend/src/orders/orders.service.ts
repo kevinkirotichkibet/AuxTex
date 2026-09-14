@@ -8,11 +8,16 @@ import { MaterialsService } from '../materials/materials.service';
 import { MeasurementsService } from '../measurements/measurements.service';
 
 // Rough fabric usage per garment category, in meters. Tune to taste.
+// Keep this in sync with FABRIC_USAGE_METERS in
+// frontend/app/products/[id]/page.tsx, since the frontend shows a price
+// estimate using the same table before the order is actually placed.
 const FABRIC_USAGE_METERS: Record<string, number> = {
   suit: 3.5,
   blazer: 2.2,
   trousers: 1.5,
   shirt: 1.8,
+  dress: 2.8,
+  skirt: 1.2,
 };
 
 @Injectable()

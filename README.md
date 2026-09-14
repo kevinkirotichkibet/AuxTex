@@ -1,7 +1,8 @@
 # AuxTex Fit
 
 A made-to-measure tailor shop: users pick a garment, choose a material,
-select their saved measurements, and place an order.
+select their saved measurements, and place an order. Prices are shown in
+Kenyan Shillings (KSh).
 
 - **backend/** — NestJS API (MongoDB via Mongoose, JWT auth)
 - **frontend/** — Next.js App Router UI
@@ -47,7 +48,16 @@ docker compose up --build
 Note: the frontend's `NEXT_PUBLIC_API_URL` is baked in at **build time**
 (set in `docker-compose.yml` under `frontend.build.args`) because it runs in
 the browser, not inside the Docker network — so it must stay
-`http://localhost:4000/api`, not `http://backend:4000/api`.
+`http://localhost:4010/api`, not `http://backend:4000/api`.
+
+### Seeding the catalog (Docker)
+
+Once the containers are up, populate the catalog with a starter set of
+materials and products:
+
+```bash
+docker compose exec backend npm run seed
+```
 
 ## Option B: Run without Docker
 
@@ -62,24 +72,31 @@ npm run start:dev
 
 API runs at `http://localhost:4000/api`.
 
-### Seeding some data
-
-There's no seed script yet — the quickest way to get started is to POST a
-couple of materials and products directly:
+### Seeding the catalog (no Docker)
 
 ```bash
-curl -X POST http://localhost:4000/api/materials \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Italian Wool - Navy","type":"wool","color":"#1a2744","pricePerMeter":45}'
-
-curl -X POST http://localhost:4000/api/products \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Bespoke Suit","category":"suit","basePrice":200,"description":"A classic two-piece suit.","compatibleMaterials":["<materialId from above>"]}'
+cd backend
+npm run build
+npm run seed
 ```
 
-(The `POST /materials` and `POST /products` endpoints are open in this
-scaffold for convenience — lock them behind an admin-only guard before going
-to production.)
+This clears and repopulates the `materials` and `products` collections with
+a starter catalog: classic fabrics (wool, cotton, linen, silk) alongside
+African prints (Maasai shuka, Kitenge/Ankara, a Kente-inspired weave, Kikoy
+stripe), and six garments (suit, blazer, shirt, trousers, dress, skirt) each
+linked to a few compatible materials. Re-run it any time to reset back to
+this starter set.
+
+The seed script also creates an **admin account** for managing the catalog
+through the UI instead of `curl`:
+
+- Email: `admin@auxtexfit.com`
+- Password: `ChangeMe123!`
+
+Log in with these at `/login`, then visit `/admin` to add materials and
+products (an "Admin" link also appears in the nav once you're logged in as
+this account). Change this password before using this anywhere but your own
+machine.
 
 ### 2. Frontend setup
 
@@ -94,19 +111,22 @@ App runs at `http://localhost:3000`.
 
 ## What's included
 
-- **Auth**: register/login with email + password, JWT-based.
+- **Auth**: register/login with email + password, JWT-based, with a `GET
+  /auth/me` endpoint so the frontend can check who's logged in and what
+  role they have.
 - **Measurement profiles**: users can save multiple profiles (e.g. one for
-  themselves, one for a family member) and pick one at checkout.
-- **Materials & Products**: browsable catalog, materials scoped per product
-  via `compatibleMaterials`.
+  themselves, one for a family member) and pick one at checkout — the first
+  saved profile is auto-selected on a product page so there's one less click.
+- **Materials & Products**: browsable, filterable-by-category catalog,
+  materials scoped per product via `compatibleMaterials`. African print
+  fabrics (Kitenge, Maasai shuka, Kente-inspired, Kikoy) render as small
+  CSS-generated patterns rather than flat colour swatches.
+- **Admin portal**: `/admin`, gated to accounts with the `admin` role, for
+  adding materials and products without touching the API directly. The
+  underlying `POST /materials` and `POST /products` endpoints are
+  role-guarded server-side too.
 - **Orders**: price is computed server-side (`basePrice + pricePerMeter *
   fabricUsage`) so the client can never manipulate the final price — the
-  frontend only shows a matching estimate.
-
-## Suggested next steps
-
-- Add an admin-only guard/role check for creating materials/products.
-- Add an `/orders` history page on the frontend.
-- Add image upload (e.g. S3/Cloudinary) instead of raw image URLs.
-- Add pagination/filtering to the catalog and material picker.
-- Write e2e tests (NestJS has good support for this out of the box).
+  frontend only shows a matching estimate, in KSh.
+- **Seed script**: `backend/src/seed.ts` — a varied starter catalog
+  including African print fabrics, plus the admin account described above.

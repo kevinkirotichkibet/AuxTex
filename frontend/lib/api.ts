@@ -60,24 +60,39 @@ export type MeasurementProfile = {
 export const api = {
   // Auth
   register: (data: { name: string; email: string; password: string }) =>
-    request<{ access_token: string; user: { id: string; email: string } }>(
+    request<{ access_token: string; user: { id: string; email: string; roles: string[] } }>(
       '/auth/register',
       { method: 'POST', body: JSON.stringify(data) },
     ),
   login: (data: { email: string; password: string }) =>
-    request<{ access_token: string; user: { id: string; email: string } }>(
+    request<{ access_token: string; user: { id: string; email: string; roles: string[] } }>(
       '/auth/login',
       { method: 'POST', body: JSON.stringify(data) },
     ),
+  me: () => request<{ userId: string; email: string; roles: string[] }>('/auth/me'),
 
   // Products
   getProducts: (category?: string) =>
     request<Product[]>(`/products${category ? `?category=${category}` : ''}`),
   getProduct: (id: string) => request<Product>(`/products/${id}`),
+  createProduct: (data: {
+    name: string;
+    category: string;
+    basePrice: number;
+    description?: string;
+    compatibleMaterials?: string[];
+  }) => request<Product>('/products', { method: 'POST', body: JSON.stringify(data) }),
 
   // Materials
   getMaterials: (type?: string) =>
     request<Material[]>(`/materials${type ? `?type=${type}` : ''}`),
+  createMaterial: (data: {
+    name: string;
+    type: string;
+    color: string;
+    pricePerMeter: number;
+    stock?: number;
+  }) => request<Material>('/materials', { method: 'POST', body: JSON.stringify(data) }),
 
   // Measurement profiles
   getMeasurementProfiles: () => request<MeasurementProfile[]>('/measurements'),
@@ -106,4 +121,8 @@ export function clearToken() {
 
 export function isLoggedIn(): boolean {
   return !!getToken();
+}
+
+export function formatKes(amount: number): string {
+  return `KSh ${amount.toLocaleString('en-KE', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 }

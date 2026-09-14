@@ -97,6 +97,26 @@ select:focus-visible {
   border-color: var(--brass);
 }
 
+.nav-logout {
+  background: none;
+  border: none;
+  color: var(--ink-muted);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 0;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  cursor: pointer;
+  width: auto;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.nav-logout:hover {
+  background: none;
+  color: var(--ink);
+  border-color: var(--brass);
+}
+
 /* ---------- Layout shell ---------- */
 
 .site-main {
@@ -181,6 +201,36 @@ select:focus-visible {
 .process-step p {
   font-size: 0.95rem;
   margin: 0;
+}
+
+/* ---------- Category filter tabs ---------- */
+
+.filter-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.filter-tab {
+  background: var(--panel);
+  color: var(--ink-muted);
+  border: 1px solid var(--line-strong);
+  padding: 0.4rem 0.9rem;
+  font-size: 0.9rem;
+  width: auto;
+}
+
+.filter-tab:hover:not(:disabled) {
+  background: var(--panel);
+  color: var(--ink);
+  border-color: var(--brass);
+}
+
+.filter-tab.active {
+  background: var(--ink);
+  color: var(--panel);
+  border-color: var(--ink);
 }
 
 /* ---------- Product grid & cards ---------- */

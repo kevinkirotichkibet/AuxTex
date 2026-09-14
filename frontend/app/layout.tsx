@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import './globals.css';
+import Header from './components/Header';
 
 export const metadata: Metadata = {
   title: 'AuxTex Fit',
@@ -19,16 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
-        <header className="site-header">
-          <Link href="/" className="brand">
-            AuxTex Fit
-          </Link>
-          <nav>
-            <Link href="/">Catalog</Link>
-            <Link href="/measurements">My Measurements</Link>
-            <Link href="/login">Login</Link>
-          </nav>
-        </header>
+        <Header />
         <main className="site-main">{children}</main>
         <footer className="site-footer">
           <p style={{ margin: 0 }}>AuxTex Fit — made-to-measure garments, cut to your exact shape.</p>
