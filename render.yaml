@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: auxtexfit-backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+    # Render injects PORT automatically; backend/src/main.ts already reads
+    # process.env.PORT, so no PORT entry is needed here.

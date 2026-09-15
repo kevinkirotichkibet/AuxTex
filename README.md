@@ -109,6 +109,113 @@ npm run dev
 
 App runs at `http://localhost:3000`.
 
+## Deploying to production (Vercel + Render + Atlas)
+
+This deploys the frontend to Vercel, the backend to Render (as a Docker web
+service, using the same `backend/Dockerfile` as local Docker), and connects
+both to a MongoDB Atlas cluster instead of a local/Docker Mongo.
+
+There's a **chicken-and-egg step** in the middle — the backend needs to know
+the frontend's URL (for CORS) and the frontend needs to know the backend's
+URL (to call the API) — so deploy in this order: **Atlas → Render → Vercel →
+back to Render** to fill in the CORS URL.
+
+### 1. MongoDB Atlas
+
+If you already have a cluster, you just need a connection string scoped to
+this app:
+
+1. In Atlas, **Database Access** → add a database user (username +
+   password) if you don't already have one for this project.
+2. **Network Access** → add an IP entry. Render's free tier doesn't have a
+   static outbound IP, so the simplest option is allowing `0.0.0.0/0`
+   (access from anywhere) — Atlas still requires the correct username/
+   password to actually connect, so this isn't the same as leaving the
+   database open. If you're on a paid Render plan with a static IP, you can
+   scope this more tightly.
+3. **Database** → **Connect** → **Drivers** → copy the connection string.
+   It looks like:
+   ```
+   mongodb+srv://<user>:<password>@<cluster>.mongodb.net/?retryWrites=true&w=majority
+   ```
+   Add a database name before the `?`, e.g. `.../auxtexfit?retryWrites=...`.
+   Keep this string somewhere — it's the `MONGODB_URI` for the next step.
+
+### 2. Backend on Render
+
+**Using the blueprint** (`render.yaml` in the repo root):
+
+1. Push this repo to GitHub (Render deploys from a git repo, not a zip
+   upload).
+2. In Render, **New** → **Blueprint**, point it at the repo. It'll detect
+   `render.yaml` and create the `auxtexfit-backend` web service, using
+   `backend/Dockerfile`.
+3. Render will prompt for the env vars marked `sync: false` in the
+   blueprint — fill in:
+   - `MONGODB_URI` — the Atlas string from step 1
+   - `JWT_SECRET` — any long random string (e.g. `openssl rand -hex 32`)
+   - `FRONTEND_URL` — leave blank for now, you'll fill this in after step 3
+4. Deploy. Once it's live, note the URL Render gives you, e.g.
+   `https://auxtexfit-backend.onrender.com`. Your API is at
+   `https://auxtexfit-backend.onrender.com/api`.
+
+**Without the blueprint:** New → Web Service → connect the repo → set
+**Root Directory** to `backend`, **Environment** to Docker (it'll pick up
+`backend/Dockerfile` automatically) → add the same three env vars above.
+
+Once deployed, seed the catalog the same way as Docker locally, just via
+Render's shell instead of `docker compose exec`:
+
+- In the Render dashboard, open the service → **Shell** tab → run:
+  ```bash
+  npm run seed
+  ```
+  (The image already has `dist/seed.js` built in, so this works without
+  installing dev dependencies — see `backend/src/seed.ts`.)
+
+### 3. Frontend on Vercel
+
+1. In Vercel, **Add New** → **Project**, import the same repo, set **Root
+   Directory** to `frontend`. Vercel auto-detects Next.js — no other config
+   needed.
+2. Under **Environment Variables**, add:
+   ```
+   NEXT_PUBLIC_API_URL = https://auxtexfit-backend.onrender.com/api
+   ```
+   (your actual Render URL from step 2, with `/api` on the end). This gets
+   baked into the client bundle at build time, same as the `NEXT_PUBLIC_API_URL`
+   build arg in `docker-compose.yml` — it's not something the frontend
+   reads at runtime.
+3. Deploy. Note the URL Vercel gives you, e.g.
+   `https://auxtex-fit.vercel.app`.
+
+### 4. Close the loop: lock down CORS
+
+Back in Render, open the backend service → **Environment** → set:
+```
+FRONTEND_URL = https://auxtex-fit.vercel.app
+```
+and redeploy (or just save — Render restarts automatically on env var
+changes). This restricts the API's CORS policy to your actual frontend
+instead of allowing any origin, which is what `FRONTEND_URL` in
+`backend/src/main.ts` is for. If you also have Vercel preview deployments
+you want to allow, add their URLs too, comma-separated.
+
+### Notes
+
+- Render's free tier spins the service down after inactivity — the first
+  request after a while will be slow (30s+) while it wakes back up. This is
+  a Render free-tier characteristic, not an app issue.
+- If you change `frontend/app/globals.css` or anything affecting the built
+  output, Vercel redeploys automatically on every push (same for Render and
+  the backend) — there's no separate manual rebuild step like there is with
+  `docker compose up --build` locally.
+- The admin account and starter catalog only exist once you run
+  `npm run seed` against whichever database `MONGODB_URI` currently points
+  to — running it locally seeds your local/Docker Mongo, running it in
+  Render's shell seeds Atlas. They're separate databases unless you point
+  both at the same `MONGODB_URI`.
+
 ## What's included
 
 - **Auth**: register/login with email + password, JWT-based, with a `GET
@@ -127,6 +234,10 @@ App runs at `http://localhost:3000`.
   role-guarded server-side too.
 - **Orders**: price is computed server-side (`basePrice + pricePerMeter *
   fabricUsage`) so the client can never manipulate the final price — the
-  frontend only shows a matching estimate, in KSh.
+  frontend only shows a matching estimate, in KSh. Customers can view their
+  orders (`/orders`), edit the material/measurements or cancel while an
+  order is still pending (`/orders/[id]`). Admins see every order with the
+  customer's name and email attached (`/admin/orders`) and can move orders
+  through pending → in production → shipped → delivered.
 - **Seed script**: `backend/src/seed.ts` — a varied starter catalog
   including African print fabrics, plus the admin account described above.

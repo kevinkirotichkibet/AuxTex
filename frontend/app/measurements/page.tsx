@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { api, MeasurementProfile, isLoggedIn } from '@/lib/api';
+import { api, MeasurementProfile } from '@/lib/api';
+import { useLoggedIn } from '@/lib/useAuth';
 
 const emptyForm = {
   label: '',
@@ -21,14 +22,20 @@ export default function MeasurementsPage() {
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
-  const loggedIn = isLoggedIn();
+  const loggedIn = useLoggedIn();
 
   function load() {
     api.getMeasurementProfiles().then(setProfiles).catch((e) => setError(e.message));
   }
 
   useEffect(() => {
-    if (loggedIn) load();
+    if (loggedIn) {
+      load();
+    } else {
+      // Identity changed (or we're logged out) — never leave a previous
+      // account's profiles on screen.
+      setProfiles([]);
+    }
   }, [loggedIn]);
 
   if (!loggedIn) {

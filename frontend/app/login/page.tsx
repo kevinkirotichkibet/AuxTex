@@ -18,7 +18,10 @@ export default function LoginPage() {
     try {
       const { access_token } = await api.login({ email, password });
       saveToken(access_token);
-      router.push('/');
+      // A full reload (not router.push) is deliberate: it guarantees every
+      // page starts from a clean slate for the newly logged-in account,
+      // rather than potentially reusing another user's cached page state.
+      window.location.href = '/';
     } catch (e: any) {
       setError(e.message);
     } finally {

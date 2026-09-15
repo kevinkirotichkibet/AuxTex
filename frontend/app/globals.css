@@ -361,6 +361,16 @@ button:disabled {
   cursor: not-allowed;
 }
 
+/* ---------- Status badge ---------- */
+
+.status-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid currentColor;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
 /* ---------- Misc ---------- */
 
 .price-box {

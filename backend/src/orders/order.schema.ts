@@ -21,7 +21,7 @@ export class Order {
   price: number;
 
   @Prop({
-    enum: ['pending', 'in_production', 'shipped', 'delivered'],
+    enum: ['pending', 'in_production', 'shipped', 'delivered', 'cancelled'],
     default: 'pending',
   })
   status: string;

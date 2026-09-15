@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { api, Material, Product, isLoggedIn } from '@/lib/api';
+import Link from 'next/link';
+import { api, Material, Product } from '@/lib/api';
+import { useLoggedIn } from '@/lib/useAuth';
 import { swatchBackground } from '@/lib/patterns';
 
 const MATERIAL_TYPES = ['wool', 'cotton', 'linen', 'silk', 'african-print'];
@@ -11,6 +13,7 @@ const materialForm = { name: '', type: 'wool', color: '#1a2744', pricePerMeter: 
 const productForm = { name: '', category: 'suit', basePrice: '', description: '' };
 
 export default function AdminPage() {
+  const loggedIn = useLoggedIn();
   const [checking, setChecking] = useState(true);
   const [authorized, setAuthorized] = useState(false);
 
@@ -27,10 +30,12 @@ export default function AdminPage() {
   const [pError, setPError] = useState('');
 
   useEffect(() => {
-    if (!isLoggedIn()) {
+    if (!loggedIn) {
       setChecking(false);
+      setAuthorized(false);
       return;
     }
+    setChecking(true);
     api
       .me()
       .then((me) => {
@@ -38,7 +43,7 @@ export default function AdminPage() {
       })
       .catch(() => setAuthorized(false))
       .finally(() => setChecking(false));
-  }, []);
+  }, [loggedIn]);
 
   function loadCatalog() {
     api.getMaterials().then(setMaterials).catch(() => {});
@@ -100,7 +105,7 @@ export default function AdminPage() {
 
   if (checking) return <p>Checking access…</p>;
 
-  if (!isLoggedIn()) {
+  if (!loggedIn) {
     return (
       <p>
         <a href="/login">Log in</a> with an admin account to manage the catalog.
@@ -114,7 +119,10 @@ export default function AdminPage() {
 
   return (
     <div>
-      <h1>Admin — manage the catalog</h1>
+      <div className="section-heading">
+        <h1>Admin — manage the catalog</h1>
+        <Link href="/admin/orders">View orders</Link>
+      </div>
 
       <h2>Add a material</h2>
       <form onSubmit={handleAddMaterial}>

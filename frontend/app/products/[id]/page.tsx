@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { api, Product, Material, MeasurementProfile, isLoggedIn, formatKes } from '@/lib/api';
+import { api, Product, Material, MeasurementProfile, formatKes } from '@/lib/api';
+import { useLoggedIn } from '@/lib/useAuth';
 import { swatchBackground } from '@/lib/patterns';
 
 // Mirrors the backend's rough fabric usage table (backend/src/orders/orders.service.ts)
@@ -19,13 +20,13 @@ const FABRIC_USAGE_METERS: Record<string, number> = {
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const loggedIn = useLoggedIn();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [profiles, setProfiles] = useState<MeasurementProfile[]>([]);
   const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null);
   const [selectedProfileId, setSelectedProfileId] = useState('');
   const [loading, setLoading] = useState(true);
-  const [loggedIn, setLoggedIn] = useState(false);
   // Kept separate on purpose: a failed page load should replace the whole
   // page, but a "pick a material first" validation error should only show
   // near the order button, not blank out the product you're looking at.
@@ -44,23 +45,30 @@ export default function ProductDetailPage() {
       })
       .catch((e) => setFetchError(e.message))
       .finally(() => setLoading(false));
-
-    const loggedInNow = isLoggedIn();
-    setLoggedIn(loggedInNow);
-    if (loggedInNow) {
-      api
-        .getMeasurementProfiles()
-        .then((fetched) => {
-          setProfiles(fetched);
-          // Most people only have one profile — save them the extra click
-          // rather than making them pick from a dropdown of one.
-          if (fetched.length > 0) setSelectedProfileId(fetched[0]._id);
-        })
-        .catch(() =>
-          setProfileError('Could not load your measurement profiles. Try logging in again.'),
-        );
-    }
   }, [id]);
+
+  // Separate from the product fetch, and keyed on `loggedIn` (which reacts
+  // to identity changes, not just first mount) — otherwise a switch to a
+  // different account wouldn't refresh which profiles are shown.
+  useEffect(() => {
+    setProfileError('');
+    if (!loggedIn) {
+      setProfiles([]);
+      setSelectedProfileId('');
+      return;
+    }
+    api
+      .getMeasurementProfiles()
+      .then((fetched) => {
+        setProfiles(fetched);
+        // Most people only have one profile — save them the extra click
+        // rather than making them pick from a dropdown of one.
+        if (fetched.length > 0) setSelectedProfileId(fetched[0]._id);
+      })
+      .catch(() =>
+        setProfileError('Could not load your measurement profiles. Try logging in again.'),
+      );
+  }, [loggedIn]);
 
   if (loading) return <p>Loading…</p>;
   if (fetchError) return <p className="error">{fetchError}</p>;
@@ -84,12 +92,12 @@ export default function ProductDetailPage() {
     setPlacing(true);
     setOrderError('');
     try {
-      await api.createOrder({
+      const order = await api.createOrder({
         productId: product._id,
         materialId: selectedMaterial._id,
         measurementProfileId: selectedProfileId,
       });
-      router.push('/measurements'); // placeholder redirect until an /orders page exists
+      router.push(`/orders/${order._id}`);
     } catch (e: any) {
       setOrderError(e.message);
     } finally {

@@ -57,6 +57,17 @@ export type MeasurementProfile = {
   height?: number;
 };
 
+export type Order = {
+  _id: string;
+  price: number;
+  status: string;
+  createdAt: string;
+  productId: Product;
+  materialId: Material;
+  measurementProfileId: MeasurementProfile;
+  userId?: { _id: string; name: string; email: string };
+};
+
 export const api = {
   // Auth
   register: (data: { name: string; email: string; password: string }) =>
@@ -101,14 +112,30 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(data),
     }),
+  updateMeasurementProfile: (id: string, data: Omit<MeasurementProfile, '_id'>) =>
+    request<MeasurementProfile>(`/measurements/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  deleteMeasurementProfile: (id: string) =>
+    request<{ deleted: boolean }>(`/measurements/${id}`, { method: 'DELETE' }),
 
   // Orders
   createOrder: (data: {
     productId: string;
     materialId: string;
     measurementProfileId: string;
-  }) => request('/orders', { method: 'POST', body: JSON.stringify(data) }),
-  getOrders: () => request('/orders'),
+  }) => request<Order>('/orders', { method: 'POST', body: JSON.stringify(data) }),
+  getOrders: () => request<Order[]>('/orders'),
+  getOrder: (id: string) => request<Order>(`/orders/${id}`),
+  updateOrder: (id: string, data: { materialId?: string; measurementProfileId?: string }) =>
+    request<Order>(`/orders/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  cancelOrder: (id: string) => request<Order>(`/orders/${id}/cancel`, { method: 'PATCH' }),
+
+  // Admin
+  adminGetAllOrders: () => request<Order[]>('/orders/admin'),
+  adminUpdateOrderStatus: (id: string, status: string) =>
+    request<Order>(`/orders/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
 };
 
 export function saveToken(token: string) {
