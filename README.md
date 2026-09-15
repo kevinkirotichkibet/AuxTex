@@ -29,7 +29,7 @@ docker compose up --build
 (These ports — 3010/4010/27020 — were chosen to avoid clashing with other
 projects you might already have running locally. Feel free to change them in
 `docker-compose.yml` if they don't suit you, just make sure
-`My_API_KEY` under `frontend.build.args` matches whatever host port
+`MY_API_KEY` under `frontend.build.args` matches whatever host port
 you map to the backend.)
 
 Data persists in a named Docker volume (`mongo-data`) across restarts. To
@@ -45,7 +45,7 @@ To rebuild after changing backend or frontend code:
 docker compose up --build
 ```
 
-Note: the frontend's `My_API_KEY` is baked in at **build time**
+Note: the frontend's `MY_API_KEY` is baked in at **build time**
 (set in `docker-compose.yml` under `frontend.build.args`) because it runs in
 the browser, not inside the Docker network — so it must stay
 `http://localhost:4010/api`, not `http://backend:4000/api`.
@@ -180,10 +180,10 @@ Render's shell instead of `docker compose exec`:
    needed.
 2. Under **Environment Variables**, add:
    ```
-   My_API_KEY = https://auxtexfit-backend.onrender.com/api
+   MY_API_KEY = https://auxtexfit-backend.onrender.com/api
    ```
    (your actual Render URL from step 2, with `/api` on the end). This gets
-   baked into the client bundle at build time, same as the `My_API_KEY`
+   baked into the client bundle at build time, same as the `MY_API_KEY`
    build arg in `docker-compose.yml` — it's not something the frontend
    reads at runtime.
 3. Deploy. Note the URL Vercel gives you, e.g.
