@@ -28,7 +28,7 @@ services:
       args:
         # Browser-facing URL — the browser runs on your host machine, not
         # inside the Docker network, so this must be localhost, not "backend".
-        MY_API_KEY: http://localhost:4010/api
+        NEXT_PUBLIC_MY_API_KEY: http://localhost:4010/api
     container_name: auxtexfit-frontend
     restart: unless-stopped
     depends_on:

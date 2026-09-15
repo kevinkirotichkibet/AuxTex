@@ -9,8 +9,8 @@ COPY . .
 
 # Baked into the client bundle at build time — must point wherever the
 # BROWSER can reach the API (i.e. your host machine, not the Docker network).
-ARG MY_API_KEY=http://localhost:4000/api
-ENV MY_API_KEY=$MY_API_KEY
+ARG NEXT_PUBLIC_MY_API_KEY=http://localhost:4000/api
+ENV NEXT_PUBLIC_MY_API_KEY=$NEXT_PUBLIC_MY_API_KEY
 
 RUN npm run build
 
