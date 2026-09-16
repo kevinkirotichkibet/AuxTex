@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_MY_API_KEY;
+const API_URL = process.env.NEXT_PUBLIC_MY_API_KEY || 'http://localhost:4000/api';
 
 function getToken(): string | null {
   if (typeof window === 'undefined') return null;

@@ -196,13 +196,20 @@ Back in Render, open the backend service → **Environment** → set:
 FRONTEND_URL = https://auxtex-fit.vercel.app
 ```
 and redeploy (or just save — Render restarts automatically on env var
-changes). This restricts the API's CORS policy to your actual frontend
-instead of allowing any origin, which is what `FRONTEND_URL` in
-`backend/src/main.ts` is for. If you also have Vercel preview deployments
-you want to allow, add their URLs too, comma-separated.
+changes). Until this is set, the backend's CORS defaults to only allowing
+`http://localhost:3000`, so your live Vercel frontend can't call it — this
+is what `FRONTEND_URL` in `backend/src/main.ts` is for. If you also have
+Vercel preview deployments you want to allow, add their URLs too,
+comma-separated.
 
 ### Notes
 
+- **Every backend route is served under `/api`** (`app.setGlobalPrefix('api')`
+  in `backend/src/main.ts`) — e.g. `GET /products` doesn't exist, it's
+  `GET /api/products`. Your Vercel `NEXT_PUBLIC_MY_API_KEY` needs the `/api`
+  suffix for the same reason: `https://auxtexfit-backend.onrender.com/api`,
+  not the bare domain. If you'd previously set it without `/api`, update it
+  and redeploy.
 - Render's free tier spins the service down after inactivity — the first
   request after a while will be slow (30s+) while it wakes back up. This is
   a Render free-tier characteristic, not an app issue.

@@ -3,12 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api, Product, formatKes } from '@/lib/api';
-
-const SWATCH_COLORS = [
-  '#21304a', '#a9793d', '#5c1f1f',
-  '#e4dfd3', '#3d4c3d', '#7a6a4f',
-  '#1c1a17', '#c99a5b', '#4a5568',
-];
+import BodySilhouette from './components/BodySilhouette';
 
 const CATEGORIES = [
   { value: '', label: 'All' },
@@ -39,24 +34,30 @@ export default function CatalogPage() {
     <div>
       <section className="hero">
         <div>
-          <h1>Clothes cut to your exact shape, not the nearest size.</h1>
+          <span className="eyebrow">Made-to-measure, tailored to you</span>
+          <h1>
+            The right fit, <em>every time.</em>
+          </h1>
           <p className="lede">
             Choose a garment, pick the fabric it's made from — from classic wool and linen to
             Maasai shuka and Kitenge prints — and enter your own measurements. Every order is
             built to fit one person: you.
           </p>
-          <a href="#catalog" className="hero-cta">
-            <button>Browse the collection</button>
-          </a>
+          <div className="hero-cta-row">
+            <a href="#catalog">
+              <button>Browse the collection</button>
+            </a>
+            <a href="#how-it-works" className="hero-secondary-link">
+              See how sizing works ↓
+            </a>
+          </div>
         </div>
-        <div className="swatch-mosaic" aria-hidden="true">
-          {SWATCH_COLORS.map((color) => (
-            <span key={color} style={{ background: color }} />
-          ))}
+        <div className="hero-visual">
+          <BodySilhouette />
         </div>
       </section>
 
-      <section className="process">
+      <section id="how-it-works" className="process">
         <div className="process-step">
           <span className="step-number">01</span>
           <h3>Choose a garment</h3>
@@ -70,7 +71,7 @@ export default function CatalogPage() {
         <div className="process-step">
           <span className="step-number">03</span>
           <h3>Enter your measurements</h3>
-          <p>Save a profile for yourself, or for anyone else you're ordering for.</p>
+          <p>Save a profile for yourself, or estimate one from a photo — either way, editable.</p>
         </div>
       </section>
 

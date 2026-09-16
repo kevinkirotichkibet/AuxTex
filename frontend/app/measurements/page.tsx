@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { api, MeasurementProfile } from '@/lib/api';
 import { useLoggedIn } from '@/lib/useAuth';
+import PhotoEstimator from '@/app/components/PhotoEstimator';
+import { PoseEstimate } from '@/lib/poseEstimate';
 
 const emptyForm = {
   label: '',
@@ -91,6 +93,23 @@ export default function MeasurementsPage() {
 
       <h2>Add a new profile</h2>
       <p>Save separate profiles for yourself, a partner, or anyone else you tailor for.</p>
+
+      <PhotoEstimator
+        onEstimate={(est: PoseEstimate) =>
+          setForm({
+            ...form,
+            unit: 'cm',
+            chest: String(est.chest),
+            waist: String(est.waist),
+            hips: String(est.hips),
+            shoulderWidth: String(est.shoulderWidth),
+            sleeveLength: String(est.sleeveLength),
+            inseam: String(est.inseam),
+            height: String(est.height),
+          })
+        }
+      />
+
       <form onSubmit={handleSubmit}>
         <input
           placeholder="Label (e.g. 'My measurements', 'Dad's suit')"

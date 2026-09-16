@@ -19,6 +19,10 @@ services:
       MONGODB_URI: mongodb://mongo:27017/auxtexfit
       JWT_SECRET: change-this-secret
       PORT: 4000
+      # Must match the frontend's host-mapped port below (3010), not the
+      # container-internal 3000 — CORS checks the origin the browser sends,
+      # and the browser is talking to localhost:3010.
+      FRONTEND_URL: http://localhost:3010
     ports:
       - "4010:4000"
 
