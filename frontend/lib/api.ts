@@ -31,6 +31,7 @@ export type Material = {
   color: string;
   pricePerMeter: number;
   images: string[];
+  stock?: number;
 };
 
 export type Product = {
@@ -105,6 +106,19 @@ export const api = {
     stock?: number;
     images?: string[];
   }) => request<Material>('/materials', { method: 'POST', body: JSON.stringify(data) }),
+  updateMaterial: (
+    id: string,
+    data: Partial<{
+      name: string;
+      type: string;
+      color: string;
+      pricePerMeter: number;
+      stock: number;
+      images: string[];
+    }>,
+  ) => request<Material>(`/materials/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteMaterial: (id: string) =>
+    request<{ deleted: boolean }>(`/materials/${id}`, { method: 'DELETE' }),
 
   // Measurement profiles
   getMeasurementProfiles: () => request<MeasurementProfile[]>('/measurements'),

@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { MaterialsService } from './materials.service';
-import { CreateMaterialDto, FilterMaterialDto } from './dto/material.dto';
+import { CreateMaterialDto, FilterMaterialDto, UpdateMaterialDto } from './dto/material.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -24,5 +24,19 @@ export class MaterialsController {
   @Post()
   create(@Body() dto: CreateMaterialDto) {
     return this.materialsService.create(dto);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @Put(':id')
+  update(@Param('id') id: string, @Body() dto: UpdateMaterialDto) {
+    return this.materialsService.update(id, dto);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.materialsService.remove(id);
   }
 }

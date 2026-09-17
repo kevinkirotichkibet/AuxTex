@@ -27,6 +27,9 @@ export default function AdminPage() {
   const [mPhotoError, setMPhotoError] = useState('');
   const [mSaving, setMSaving] = useState(false);
   const [mError, setMError] = useState('');
+  const [editingMaterialId, setEditingMaterialId] = useState<string | null>(null);
+  const [deletingMaterialId, setDeletingMaterialId] = useState<string | null>(null);
+  const [mListError, setMListError] = useState('');
 
   const [pForm, setPForm] = useState(productForm);
   const [selectedMaterialIds, setSelectedMaterialIds] = useState<string[]>([]);
@@ -70,27 +73,69 @@ export default function AdminPage() {
     }
   }
 
-  async function handleAddMaterial(e: React.FormEvent) {
+  async function handleSaveMaterial(e: React.FormEvent) {
     e.preventDefault();
     setMSaving(true);
     setMError('');
     try {
-      await api.createMaterial({
+      const payload = {
         name: mForm.name,
         type: mForm.type,
         color: mForm.color,
         pricePerMeter: Number(mForm.pricePerMeter),
         stock: mForm.stock ? Number(mForm.stock) : undefined,
-        images: mPhoto ? [mPhoto] : undefined,
-      });
-      setMForm(materialForm);
-      setMCustomType(false);
-      setMPhoto(null);
+        images: mPhoto ? [mPhoto] : [],
+      };
+      if (editingMaterialId) {
+        await api.updateMaterial(editingMaterialId, payload);
+      } else {
+        await api.createMaterial(payload);
+      }
+      cancelEditMaterial();
       loadCatalog();
     } catch (e: any) {
       setMError(e.message);
     } finally {
       setMSaving(false);
+    }
+  }
+
+  function startEditMaterial(m: Material) {
+    setMForm({
+      name: m.name,
+      type: m.type,
+      color: m.color,
+      pricePerMeter: String(m.pricePerMeter),
+      stock: m.stock != null ? String(m.stock) : '',
+    });
+    setMCustomType(!MATERIAL_TYPES.includes(m.type));
+    setMPhoto(m.images?.[0] ?? null);
+    setMPhotoError('');
+    setMError('');
+    setEditingMaterialId(m._id);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function cancelEditMaterial() {
+    setMForm(materialForm);
+    setMCustomType(false);
+    setMPhoto(null);
+    setMPhotoError('');
+    setEditingMaterialId(null);
+  }
+
+  async function handleDeleteMaterial(m: Material) {
+    if (!confirm(`Delete "${m.name}"? This can't be undone.`)) return;
+    setDeletingMaterialId(m._id);
+    setMListError('');
+    try {
+      await api.deleteMaterial(m._id);
+      if (editingMaterialId === m._id) cancelEditMaterial();
+      loadCatalog();
+    } catch (e: any) {
+      setMListError(e.message);
+    } finally {
+      setDeletingMaterialId(null);
     }
   }
 
@@ -143,8 +188,8 @@ export default function AdminPage() {
         <Link href="/admin/orders">View orders</Link>
       </div>
 
-      <h2>Add a material</h2>
-      <form onSubmit={handleAddMaterial}>
+      <h2>{editingMaterialId ? 'Edit material' : 'Add a material'}</h2>
+      <form onSubmit={handleSaveMaterial}>
         <input
           placeholder="Name (e.g. 'Kitenge - Sunburst Ankara')"
           value={mForm.name}
@@ -237,16 +282,41 @@ export default function AdminPage() {
           onChange={(e) => setMForm({ ...mForm, stock: e.target.value })}
         />
         {mError && <p className="error">{mError}</p>}
-        <button type="submit" disabled={mSaving}>
-          {mSaving ? 'Saving…' : 'Add material'}
-        </button>
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <button type="submit" disabled={mSaving}>
+            {mSaving ? 'Saving…' : editingMaterialId ? 'Update material' : 'Add material'}
+          </button>
+          {editingMaterialId && (
+            <button type="button" onClick={cancelEditMaterial} disabled={mSaving}>
+              Cancel
+            </button>
+          )}
+        </div>
       </form>
 
+      {mListError && <p className="error" style={{ marginTop: '1rem' }}>{mListError}</p>}
       <div className="swatch-grid" style={{ marginTop: '1.5rem' }}>
         {materials.map((m) => (
-          <div key={m._id} className="swatch">
+          <div key={m._id} className="swatch" style={{ cursor: 'default' }}>
             <div className="swatch-color" style={swatchStyle(m)} />
             <small>{m.name}</small>
+            <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.5rem' }}>
+              <button
+                type="button"
+                onClick={() => startEditMaterial(m)}
+                style={{ fontSize: '0.8rem', padding: '0.3rem 0.7rem' }}
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDeleteMaterial(m)}
+                disabled={deletingMaterialId === m._id}
+                style={{ fontSize: '0.8rem', padding: '0.3rem 0.7rem', background: 'var(--error)' }}
+              >
+                {deletingMaterialId === m._id ? '…' : 'Delete'}
+              </button>
+            </div>
           </div>
         ))}
       </div>
