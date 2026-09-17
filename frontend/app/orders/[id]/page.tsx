@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { api, Order, Material, MeasurementProfile, formatKes } from '@/lib/api';
 import { useLoggedIn } from '@/lib/useAuth';
 import { swatchBackground } from '@/lib/patterns';
@@ -98,6 +99,10 @@ export default function OrderDetailPage() {
 
   return (
     <div>
+      <Link href="/" className="hero-secondary-link" style={{ display: 'inline-block', marginBottom: '1rem' }}>
+        ← Continue exploring the collection
+      </Link>
+
       <h1>{order.productId.name}</h1>
       <span className="status-badge" style={{ color: statusColor(order.status) }}>
         {statusLabel(order.status)}
@@ -122,13 +127,16 @@ export default function OrderDetailPage() {
 
           {actionError && <p className="error">{actionError}</p>}
 
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
             {canEdit && <button onClick={() => setEditing(true)}>Edit order</button>}
             {canCancel && (
               <button onClick={handleCancel} disabled={busy}>
                 {busy ? 'Cancelling…' : 'Cancel order'}
               </button>
             )}
+            <Link href="/">
+              <button>Continue shopping</button>
+            </Link>
           </div>
           {!canEdit && !canCancel && (
             <p>This order is {statusLabel(order.status).toLowerCase()} and can no longer be changed.</p>

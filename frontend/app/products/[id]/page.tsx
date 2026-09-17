@@ -156,6 +156,11 @@ export default function ProductDetailPage() {
           <a href="/login">Log in</a> to select or save your measurements.
         </p>
       )}
+      {loggedIn && (
+        <p style={{ fontSize: '0.9rem' }}>
+          Don't know your measurements? <a href="/measurements">Estimate them from a photo</a>.
+        </p>
+      )}
 
       <div className="price-box">Estimated price: {formatKes(price)}</div>
       {orderError && <p className="error">{orderError}</p>}

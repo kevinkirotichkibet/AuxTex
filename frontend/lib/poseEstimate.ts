@@ -62,26 +62,38 @@ function widthToCircumference(widthCm: number, depthRatio: number): number {
 }
 
 // Normalizes whatever image the person uploaded into something the model
-// can reliably read: this fixes three real failure modes at once —
+// can reliably read. This fixes several real failure modes at once:
 // (1) EXIF-rotated phone photos (createImageBitmap with imageOrientation
 // handles this; a plain <img> tag doesn't always, and pose models read raw
 // pixels, not what the browser *displays*), (2) transparent PNGs, whose
 // see-through areas can render as black or a checkerboard pattern depending
 // on the browser, confusing the model — this flattens them onto a plain
-// white background instead, and (3) very large source images, which are
-// downscaled to a consistent max size.
+// white background instead, and (3) MoveNet internally resizes whatever
+// it's given to a FIXED SQUARE input size. A tall portrait photo (the
+// normal shape for a full-body photo) passed in at its natural aspect
+// ratio gets squashed vertically by that resize, which distorts exactly
+// the top and bottom of the frame — i.e. the head and feet — while barely
+// touching the torso in the middle. That precise pattern (confident
+// shoulders/hips, near-zero-confidence nose/ankles) is what a squashed
+// image looks like. Letterboxing onto a square canvas ourselves, instead
+// of letting the library's resize do it, avoids the distortion entirely.
 async function normalizeImage(file: File): Promise<HTMLCanvasElement> {
   const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
-  const MAX_DIM = 800;
-  const scale = Math.min(1, MAX_DIM / Math.max(bitmap.width, bitmap.height));
+  const SIZE = 640;
+  const scale = Math.min(SIZE / bitmap.width, SIZE / bitmap.height);
+  const drawWidth = bitmap.width * scale;
+  const drawHeight = bitmap.height * scale;
+  const offsetX = (SIZE - drawWidth) / 2;
+  const offsetY = (SIZE - drawHeight) / 2;
+
   const canvas = document.createElement('canvas');
-  canvas.width = Math.round(bitmap.width * scale);
-  canvas.height = Math.round(bitmap.height * scale);
+  canvas.width = SIZE;
+  canvas.height = SIZE;
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Could not process that image in this browser.');
   ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, SIZE, SIZE);
+  ctx.drawImage(bitmap, offsetX, offsetY, drawWidth, drawHeight);
   bitmap.close();
   return canvas;
 }
