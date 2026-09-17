@@ -22,6 +22,7 @@ export default function AdminPage() {
   const [products, setProducts] = useState<Product[]>([]);
 
   const [mForm, setMForm] = useState(materialForm);
+  const [mCustomType, setMCustomType] = useState(false);
   const [mPhoto, setMPhoto] = useState<string | null>(null);
   const [mPhotoError, setMPhotoError] = useState('');
   const [mSaving, setMSaving] = useState(false);
@@ -83,6 +84,7 @@ export default function AdminPage() {
         images: mPhoto ? [mPhoto] : undefined,
       });
       setMForm(materialForm);
+      setMCustomType(false);
       setMPhoto(null);
       loadCatalog();
     } catch (e: any) {
@@ -149,18 +151,46 @@ export default function AdminPage() {
           onChange={(e) => setMForm({ ...mForm, name: e.target.value })}
           required
         />
-        <input
-          list="material-type-suggestions"
-          placeholder="Type (e.g. 'wool', 'kitenge', or anything else)"
-          value={mForm.type}
-          onChange={(e) => setMForm({ ...mForm, type: e.target.value })}
-          required
-        />
-        <datalist id="material-type-suggestions">
-          {MATERIAL_TYPES.map((t) => (
-            <option key={t} value={t} />
-          ))}
-        </datalist>
+        {mCustomType ? (
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <input
+              placeholder="Type your own (e.g. 'kitenge', 'kente', 'denim')"
+              value={mForm.type}
+              onChange={(e) => setMForm({ ...mForm, type: e.target.value })}
+              required
+              autoFocus
+              style={{ flex: 1 }}
+            />
+            <button
+              type="button"
+              onClick={() => {
+                setMCustomType(false);
+                setMForm({ ...mForm, type: MATERIAL_TYPES[0] });
+              }}
+            >
+              Use preset instead
+            </button>
+          </div>
+        ) : (
+          <select
+            value={mForm.type}
+            onChange={(e) => {
+              if (e.target.value === '__custom__') {
+                setMCustomType(true);
+                setMForm({ ...mForm, type: '' });
+              } else {
+                setMForm({ ...mForm, type: e.target.value });
+              }
+            }}
+          >
+            {MATERIAL_TYPES.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+            <option value="__custom__">+ Add a new type…</option>
+          </select>
+        )}
         <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
           <input
             type="color"
