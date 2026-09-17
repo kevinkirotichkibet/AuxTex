@@ -1,4 +1,5 @@
 import { Material } from './api';
+import type { CSSProperties } from 'react';
 
 // Plain wool/cotton/linen/silk are accurately represented by a flat colour
 // swatch. Prints aren't — a solid block doesn't read as "Kitenge" or
@@ -25,4 +26,19 @@ export function swatchBackground(material: Pick<Material, 'name' | 'color'>): st
     return `repeating-linear-gradient(0deg, ${c} 0px 10px, #ffffff 10px 14px)`;
   }
   return c;
+}
+
+// If an admin has uploaded an actual photo of the fabric, that's always
+// more accurate than our synthetic pattern guess — prefer it. Falls back
+// to the CSS pattern/colour above when no photo exists.
+export function swatchStyle(material: Pick<Material, 'name' | 'color' | 'images'>): CSSProperties {
+  const photo = material.images?.[0];
+  if (photo) {
+    return {
+      backgroundImage: `url(${photo})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    };
+  }
+  return { background: swatchBackground(material) };
 }

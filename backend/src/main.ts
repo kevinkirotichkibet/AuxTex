@@ -1,9 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { json } from 'express';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Express's default JSON body limit is 100kb. Material photos are sent as
+  // a base64 data URL in the request body (see materials.controller.ts) —
+  // even after client-side compression, that easily exceeds 100kb, so this
+  // needs raising or every photo upload would 413.
+  app.use(json({ limit: '5mb' }));
 
   // FRONTEND_URL restricts CORS to your actual deployed frontend (e.g. your
   // Vercel URL) in production. Left unset, it falls back to localhost for

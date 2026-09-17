@@ -103,6 +103,7 @@ export const api = {
     color: string;
     pricePerMeter: number;
     stock?: number;
+    images?: string[];
   }) => request<Material>('/materials', { method: 'POST', body: JSON.stringify(data) }),
 
   // Measurement profiles

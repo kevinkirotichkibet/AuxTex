@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api, Material, Product } from '@/lib/api';
 import { useLoggedIn } from '@/lib/useAuth';
-import { swatchBackground } from '@/lib/patterns';
+import { swatchStyle } from '@/lib/patterns';
+import { fileToCompressedDataUrl } from '@/lib/imageUpload';
 
 const MATERIAL_TYPES = ['wool', 'cotton', 'linen', 'silk', 'african-print'];
 const CATEGORIES = ['suit', 'blazer', 'shirt', 'trousers', 'dress', 'skirt'];
@@ -21,6 +22,8 @@ export default function AdminPage() {
   const [products, setProducts] = useState<Product[]>([]);
 
   const [mForm, setMForm] = useState(materialForm);
+  const [mPhoto, setMPhoto] = useState<string | null>(null);
+  const [mPhotoError, setMPhotoError] = useState('');
   const [mSaving, setMSaving] = useState(false);
   const [mError, setMError] = useState('');
 
@@ -54,6 +57,18 @@ export default function AdminPage() {
     if (authorized) loadCatalog();
   }, [authorized]);
 
+  async function handlePhotoSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setMPhotoError('');
+    try {
+      const dataUrl = await fileToCompressedDataUrl(file);
+      setMPhoto(dataUrl);
+    } catch (err: any) {
+      setMPhotoError(err.message || 'Could not process that photo.');
+    }
+  }
+
   async function handleAddMaterial(e: React.FormEvent) {
     e.preventDefault();
     setMSaving(true);
@@ -65,8 +80,10 @@ export default function AdminPage() {
         color: mForm.color,
         pricePerMeter: Number(mForm.pricePerMeter),
         stock: mForm.stock ? Number(mForm.stock) : undefined,
+        images: mPhoto ? [mPhoto] : undefined,
       });
       setMForm(materialForm);
+      setMPhoto(null);
       loadCatalog();
     } catch (e: any) {
       setMError(e.message);
@@ -132,13 +149,18 @@ export default function AdminPage() {
           onChange={(e) => setMForm({ ...mForm, name: e.target.value })}
           required
         />
-        <select value={mForm.type} onChange={(e) => setMForm({ ...mForm, type: e.target.value })}>
+        <input
+          list="material-type-suggestions"
+          placeholder="Type (e.g. 'wool', 'kitenge', or anything else)"
+          value={mForm.type}
+          onChange={(e) => setMForm({ ...mForm, type: e.target.value })}
+          required
+        />
+        <datalist id="material-type-suggestions">
           {MATERIAL_TYPES.map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
+            <option key={t} value={t} />
           ))}
-        </select>
+        </datalist>
         <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
           <input
             type="color"
@@ -146,8 +168,31 @@ export default function AdminPage() {
             onChange={(e) => setMForm({ ...mForm, color: e.target.value })}
             style={{ padding: 0, width: 48, height: 38 }}
           />
-          <span style={{ color: 'var(--ink-muted)', fontSize: '0.9rem' }}>Base colour</span>
+          <span style={{ color: 'var(--ink-muted)', fontSize: '0.9rem' }}>
+            Base colour (used if no photo is uploaded)
+          </span>
         </label>
+        <div>
+          <label style={{ fontSize: '0.9rem', color: 'var(--ink-muted)', display: 'block', marginBottom: '0.3rem' }}>
+            Fabric photo (optional, but recommended for prints — a real photo beats a guessed pattern)
+          </label>
+          <input type="file" accept="image/*" onChange={handlePhotoSelect} />
+          {mPhotoError && <p className="error">{mPhotoError}</p>}
+          {mPhoto && (
+            <div
+              style={{
+                marginTop: '0.5rem',
+                width: 90,
+                height: 90,
+                borderRadius: 10,
+                border: '1px solid var(--line)',
+                backgroundImage: `url(${mPhoto})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
+            />
+          )}
+        </div>
         <input
           placeholder="Price per meter (KSh)"
           type="number"
@@ -170,7 +215,7 @@ export default function AdminPage() {
       <div className="swatch-grid" style={{ marginTop: '1.5rem' }}>
         {materials.map((m) => (
           <div key={m._id} className="swatch">
-            <div className="swatch-color" style={{ background: swatchBackground(m) }} />
+            <div className="swatch-color" style={swatchStyle(m)} />
             <small>{m.name}</small>
           </div>
         ))}
@@ -215,7 +260,7 @@ export default function AdminPage() {
               className={`swatch ${selectedMaterialIds.includes(m._id) ? 'selected' : ''}`}
               onClick={() => toggleMaterial(m._id)}
             >
-              <div className="swatch-color" style={{ background: swatchBackground(m) }} />
+              <div className="swatch-color" style={swatchStyle(m)} />
               <small>{m.name}</small>
             </div>
           ))}

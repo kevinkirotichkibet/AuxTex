@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api, Order, Material, MeasurementProfile, formatKes } from '@/lib/api';
 import { useLoggedIn } from '@/lib/useAuth';
-import { swatchBackground } from '@/lib/patterns';
+import { swatchStyle } from '@/lib/patterns';
 import { statusLabel, statusColor } from '@/lib/orderStatus';
 
 const EDITABLE_STATUSES = ['pending'];
@@ -117,7 +117,7 @@ export default function OrderDetailPage() {
           <h3>Material</h3>
           <div className="swatch-grid">
             <div className="swatch selected">
-              <div className="swatch-color" style={{ background: swatchBackground(order.materialId) }} />
+              <div className="swatch-color" style={swatchStyle(order.materialId)} />
               <small>{order.materialId.name}</small>
             </div>
           </div>
@@ -146,13 +146,13 @@ export default function OrderDetailPage() {
         <>
           <h3>Choose your material</h3>
           <div className="swatch-grid">
-            {order.productId.compatibleMaterials.map((m) => (
+            {(order.productId.compatibleMaterials ?? []).map((m) => (
               <div
                 key={m._id}
                 className={`swatch ${selectedMaterial?._id === m._id ? 'selected' : ''}`}
                 onClick={() => setSelectedMaterial(m)}
               >
-                <div className="swatch-color" style={{ background: swatchBackground(m) }} />
+                <div className="swatch-color" style={swatchStyle(m)} />
                 <small>{m.name}</small>
               </div>
             ))}

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { api, Product, Material, MeasurementProfile, formatKes } from '@/lib/api';
 import { useLoggedIn } from '@/lib/useAuth';
-import { swatchBackground } from '@/lib/patterns';
+import { swatchStyle } from '@/lib/patterns';
 
 // Mirrors the backend's rough fabric usage table (backend/src/orders/orders.service.ts)
 // so the price preview matches what the server will actually charge.
@@ -123,7 +123,7 @@ export default function ProductDetailPage() {
             className={`swatch ${selectedMaterial?._id === m._id ? 'selected' : ''}`}
             onClick={() => setSelectedMaterial(m)}
           >
-            <div className="swatch-color" style={{ background: swatchBackground(m) }} />
+            <div className="swatch-color" style={swatchStyle(m)} />
             <small>{m.name}</small>
           </div>
         ))}

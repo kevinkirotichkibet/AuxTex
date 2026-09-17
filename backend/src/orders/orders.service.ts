@@ -57,7 +57,7 @@ export class OrdersService {
   findAllForUser(userId: string) {
     return this.orderModel
       .find({ userId })
-      .populate('productId')
+      .populate({ path: 'productId', populate: { path: 'compatibleMaterials' } })
       .populate('materialId')
       .populate('measurementProfileId')
       .sort({ createdAt: -1 })
@@ -67,7 +67,7 @@ export class OrdersService {
   async findOneForUser(id: string, userId: string) {
     const order = await this.orderModel
       .findOne({ _id: id, userId })
-      .populate('productId')
+      .populate({ path: 'productId', populate: { path: 'compatibleMaterials' } })
       .populate('materialId')
       .populate('measurementProfileId')
       .exec();
@@ -121,7 +121,7 @@ export class OrdersService {
     return this.orderModel
       .find()
       .populate('userId', 'name email')
-      .populate('productId')
+      .populate({ path: 'productId', populate: { path: 'compatibleMaterials' } })
       .populate('materialId')
       .populate('measurementProfileId')
       .sort({ createdAt: -1 })
