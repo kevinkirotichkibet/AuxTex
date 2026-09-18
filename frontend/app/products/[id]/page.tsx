@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { api, Product, Material, MeasurementProfile, formatKes } from '@/lib/api';
 import { useLoggedIn } from '@/lib/useAuth';
 import { swatchStyle } from '@/lib/patterns';
+import FitAvatar from '@/app/components/FitAvatar';
 
 // Mirrors the backend's rough fabric usage table (backend/src/orders/orders.service.ts)
 // so the price preview matches what the server will actually charge.
@@ -78,6 +79,7 @@ export default function ProductDetailPage() {
   const price = selectedMaterial
     ? product.basePrice + selectedMaterial.pricePerMeter * usage
     : product.basePrice;
+  const selectedProfile = profiles.find((p) => p._id === selectedProfileId) ?? null;
 
   async function handleOrder() {
     if (!product) return;
@@ -106,68 +108,74 @@ export default function ProductDetailPage() {
   }
 
   return (
-    <div>
-      <img
-        src={product.images?.[0] || 'https://placehold.co/700x400'}
-        alt={product.name}
-        style={{ width: '100%', maxHeight: 400, objectFit: 'cover', border: '1px solid var(--line)' }}
-      />
-      <h1>{product.name}</h1>
-      <p>{product.description}</p>
+    <div className="product-layout">
+      <div>
+        <img
+          src={product.images?.[0] || 'https://placehold.co/700x400'}
+          alt={product.name}
+          style={{ width: '100%', maxHeight: 400, objectFit: 'cover', border: '1px solid var(--line)' }}
+        />
+        <h1>{product.name}</h1>
+        <p>{product.description}</p>
 
-      <h3>Choose your material</h3>
-      <div className="swatch-grid">
-        {product.compatibleMaterials.map((m) => (
-          <div
-            key={m._id}
-            className={`swatch ${selectedMaterial?._id === m._id ? 'selected' : ''}`}
-            onClick={() => setSelectedMaterial(m)}
-          >
-            <div className="swatch-color" style={swatchStyle(m)} />
-            <small>{m.name}</small>
-          </div>
-        ))}
-        {product.compatibleMaterials.length === 0 && (
-          <p style={{ gridColumn: '1 / -1' }}>No materials linked to this product yet.</p>
+        <h3>Choose your material</h3>
+        <div className="swatch-grid">
+          {product.compatibleMaterials.map((m) => (
+            <div
+              key={m._id}
+              className={`swatch ${selectedMaterial?._id === m._id ? 'selected' : ''}`}
+              onClick={() => setSelectedMaterial(m)}
+            >
+              <div className="swatch-color" style={swatchStyle(m)} />
+              <small>{m.name}</small>
+            </div>
+          ))}
+          {product.compatibleMaterials.length === 0 && (
+            <p style={{ gridColumn: '1 / -1' }}>No materials linked to this product yet.</p>
+          )}
+        </div>
+
+        <h3>Select your measurements</h3>
+        {profileError && <p className="error">{profileError}</p>}
+        {loggedIn ? (
+          profiles.length > 0 ? (
+            <select value={selectedProfileId} onChange={(e) => setSelectedProfileId(e.target.value)}>
+              <option value="">Select a profile…</option>
+              {profiles.map((p) => (
+                <option key={p._id} value={p._id}>
+                  {p.label}
+                </option>
+              ))}
+            </select>
+          ) : (
+            !profileError && (
+              <p>
+                No saved profiles yet. <a href="/measurements">Add one</a>.
+              </p>
+            )
+          )
+        ) : (
+          <p>
+            <a href="/login">Log in</a> to select or save your measurements.
+          </p>
         )}
+        {loggedIn && (
+          <p style={{ fontSize: '0.9rem' }}>
+            Don't know your measurements? <a href="/measurements">Estimate them from a photo</a>.
+          </p>
+        )}
+
+        <div className="price-box">Estimated price: {formatKes(price)}</div>
+        {orderError && <p className="error">{orderError}</p>}
+
+        <button onClick={handleOrder} disabled={placing}>
+          {placing ? 'Placing order…' : 'Place order'}
+        </button>
       </div>
 
-      <h3>Select your measurements</h3>
-      {profileError && <p className="error">{profileError}</p>}
-      {loggedIn ? (
-        profiles.length > 0 ? (
-          <select value={selectedProfileId} onChange={(e) => setSelectedProfileId(e.target.value)}>
-            <option value="">Select a profile…</option>
-            {profiles.map((p) => (
-              <option key={p._id} value={p._id}>
-                {p.label}
-              </option>
-            ))}
-          </select>
-        ) : (
-          !profileError && (
-            <p>
-              No saved profiles yet. <a href="/measurements">Add one</a>.
-            </p>
-          )
-        )
-      ) : (
-        <p>
-          <a href="/login">Log in</a> to select or save your measurements.
-        </p>
-      )}
-      {loggedIn && (
-        <p style={{ fontSize: '0.9rem' }}>
-          Don't know your measurements? <a href="/measurements">Estimate them from a photo</a>.
-        </p>
-      )}
-
-      <div className="price-box">Estimated price: {formatKes(price)}</div>
-      {orderError && <p className="error">{orderError}</p>}
-
-      <button onClick={handleOrder} disabled={placing}>
-        {placing ? 'Placing order…' : 'Place order'}
-      </button>
+      <div className="avatar-panel">
+        <FitAvatar material={selectedMaterial} profile={selectedProfile} />
+      </div>
     </div>
   );
 }

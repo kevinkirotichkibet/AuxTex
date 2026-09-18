@@ -73,12 +73,33 @@ select:focus-visible {
 /* ---------- Header ---------- */
 
 .site-header {
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.site-header-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.4rem 2.5rem;
-  border-bottom: 1px solid var(--line);
-  background: var(--panel);
+  padding: 1.1rem 1.5rem;
+}
+
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--ink);
+  font-size: 1.4rem;
+  padding: 0.2rem 0.4rem;
+  width: auto;
+  cursor: pointer;
+}
+
+.mobile-nav {
+  display: none;
 }
 
 .brand {
@@ -90,7 +111,7 @@ select:focus-visible {
   letter-spacing: -0.01em;
 }
 
-.site-header nav {
+.desktop-nav {
   display: flex;
   align-items: center;
   gap: 2rem;
@@ -409,4 +430,133 @@ button:disabled {
 .error {
   color: var(--error);
   font-size: 0.9rem;
+}
+
+/* ---------- Fit avatar preview ---------- */
+
+.avatar-panel {
+  position: sticky;
+  top: 90px;
+  align-self: start;
+  background: radial-gradient(circle at 60% 30%, #eaf0fd 0%, #f7f9fc 70%);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.avatar-panel .avatar-caption {
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  margin-top: 0.75rem;
+}
+
+.product-layout {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+/* ---------- Admin order rows (responsive table) ---------- */
+
+.order-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* ============================================================
+   Responsive — none of the above had any small-screen handling
+   until now: fixed multi-column grids and a 5-item nav with no
+   wrap point meant mobile was reliably cramped/overflowing.
+   ============================================================ */
+
+@media (max-width: 860px) {
+  .product-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .avatar-panel {
+    position: static;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-visual {
+    order: -1;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+
+  .process {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .desktop-nav {
+    display: none;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  .mobile-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0 1.5rem 1.25rem;
+    border-top: 1px solid var(--line);
+    padding-top: 1rem;
+  }
+
+  .mobile-nav a,
+  .mobile-nav .nav-logout {
+    padding: 0.6rem 0;
+    font-size: 1rem;
+  }
+
+  .site-main {
+    padding: 2rem 1.25rem 3rem;
+  }
+
+  .site-header-row {
+    padding: 1rem 1.25rem;
+  }
+
+  h1 { font-size: 1.9rem; }
+
+  .order-row {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+    text-align: left;
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-main {
+    padding: 1.5rem 1rem 2.5rem;
+  }
+
+  .product-grid,
+  .swatch-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  .filter-tabs {
+    gap: 0.4rem;
+  }
+
+  .filter-tab {
+    padding: 0.35rem 0.8rem;
+    font-size: 0.85rem;
+  }
 }

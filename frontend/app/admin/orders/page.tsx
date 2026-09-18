@@ -85,16 +85,7 @@ export default function AdminOrdersPage() {
         }}
       >
         {orders.map((o) => (
-          <div
-            key={o._id}
-            className="card"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1fr',
-              gap: '1rem',
-              alignItems: 'center',
-            }}
-          >
+          <div key={o._id} className="card order-row">
             <div>
               <strong>{o.productId?.name}</strong>
               <div style={{ color: 'var(--ink-muted)', fontSize: '0.85rem' }}>{o.materialId?.name}</div>
