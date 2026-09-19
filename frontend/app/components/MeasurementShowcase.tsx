@@ -27,13 +27,13 @@ const FIGURES: Figure[] = [
     key: 'female',
     label: 'Female',
     image: '/images/figure-female.png',
-    points: { chest: 33, waist: 46, hips: 55 },
+    points: { chest: 26, waist: 37, hips: 48 },
   },
   {
     key: 'male',
     label: 'Male',
-    image: null,
-    placeholder: "Male reference photo coming soon — the diagram works the same way once it's added.",
+    image: '/images/figure-male.png',
+    points: { chest: 27, waist: 37, hips: 47 },
   },
   {
     key: 'kids',
