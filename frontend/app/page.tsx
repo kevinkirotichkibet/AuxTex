@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api, Product, formatKes } from '@/lib/api';
 import MeasurementShowcase from './components/MeasurementShowcase';
+import { HOMEPAGE_FIGURES, HOMEPAGE_MEASUREMENT_META } from '@/lib/showcaseData';
 
 const CATEGORIES = [
   { value: '', label: 'All' },
@@ -53,7 +54,7 @@ export default function CatalogPage() {
           </div>
         </div>
         <div className="hero-visual">
-          <MeasurementShowcase />
+          <MeasurementShowcase figures={HOMEPAGE_FIGURES} measurementMeta={HOMEPAGE_MEASUREMENT_META} />
         </div>
       </section>
 

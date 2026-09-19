@@ -6,6 +6,8 @@ import { useLoggedIn } from '@/lib/useAuth';
 import PhotoEstimator from '@/app/components/PhotoEstimator';
 import { PoseEstimate } from '@/lib/poseEstimate';
 import FitAvatar from '@/app/components/FitAvatar';
+import MeasurementShowcase from '@/app/components/MeasurementShowcase';
+import { MEASURE_GUIDE_FIGURES, MEASURE_GUIDE_META } from '@/lib/showcaseData';
 
 const emptyForm = {
   label: '',
@@ -26,6 +28,7 @@ export default function MeasurementsPage() {
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
   const loggedIn = useLoggedIn();
 
   function load() {
@@ -95,6 +98,26 @@ export default function MeasurementsPage() {
 
       <h2>Add a new profile</h2>
       <p>Save separate profiles for yourself, a partner, or anyone else you tailor for.</p>
+
+      {!showGuide ? (
+        <button type="button" onClick={() => setShowGuide(true)}>
+          How to measure yourself
+        </button>
+      ) : (
+        <div style={{ border: '1px solid var(--line)', padding: '1.25rem', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <h3 style={{ marginTop: 0 }}>How to measure yourself</h3>
+            <button type="button" onClick={() => setShowGuide(false)} style={{ fontSize: '0.85rem' }}>
+              Close
+            </button>
+          </div>
+          <MeasurementShowcase
+            figures={MEASURE_GUIDE_FIGURES}
+            measurementMeta={MEASURE_GUIDE_META}
+            autoAdvance={false}
+          />
+        </div>
+      )}
 
       <PhotoEstimator
         gender={form.gender}

@@ -2,85 +2,79 @@
 
 import { useEffect, useState } from 'react';
 
-type MeasurementKey = 'chest' | 'waist' | 'hips';
+export type MeasurementKey = 'chest' | 'waist' | 'hips';
 
-type Figure = {
+export type ShowcaseFigure = {
   key: string;
   label: string;
   image: string | null;
   // Position of each measurement line, as a percentage of the image's
   // height — estimated by eye from the actual photo, not measured
   // precisely. Omitted entirely (rather than guessed) for a photo where
-  // that wouldn't mean much, like the two-child preview image.
-  points?: Record<MeasurementKey, number>;
+  // that wouldn't mean much, like a multi-person preview image.
+  points?: Partial<Record<MeasurementKey, number>>;
   placeholder?: string;
 };
 
-const MEASUREMENT_META: Record<MeasurementKey, { label: string; desc: string }> = {
-  chest: { label: 'Chest', desc: 'Measured around the fullest part of the chest, under the arms.' },
-  waist: { label: 'Waist', desc: 'Measured around the natural waistline, where the body bends side to side.' },
-  hips: { label: 'Hips', desc: 'Measured around the fullest part of the hips and seat.' },
-};
+type MeasurementMeta = { label: string; desc: string };
 
-const FIGURES: Figure[] = [
-  {
-    key: 'female',
-    label: 'Female',
-    image: '/images/figure-female.png',
-    points: { chest: 26, waist: 37, hips: 48 },
-  },
-  {
-    key: 'male',
-    label: 'Male',
-    image: '/images/figure-male.png',
-    points: { chest: 27, waist: 37, hips: 47 },
-  },
-  {
-    key: 'kids',
-    label: 'Kids',
-    image: '/images/figure-kids.png',
-    placeholder: "Kids' sizing isn't in the catalog yet — this is a preview of what's coming.",
-  },
-];
+type Props = {
+  figures: ShowcaseFigure[];
+  measurementMeta: Record<MeasurementKey, MeasurementMeta>;
+  autoAdvance?: boolean;
+  defaultCaption?: string;
+};
 
 const AUTO_ADVANCE_MS = 5000;
 
-export default function MeasurementShowcase() {
+export default function MeasurementShowcase({
+  figures,
+  measurementMeta,
+  autoAdvance = true,
+  defaultCaption = 'Hover or tap a label to see how that measurement is taken.',
+}: Props) {
   const [index, setIndex] = useState(0);
   const [activeKey, setActiveKey] = useState<MeasurementKey | null>(null);
 
-  const figure = FIGURES[index];
+  const figure = figures[index];
 
   // Auto-advance the carousel, but stop nudging the person once they've
-  // deliberately picked a figure via the toggle or arrows — re-arm after a
-  // pause rather than fighting their choice indefinitely.
+  // deliberately picked a figure via the toggle — re-arm after a pause
+  // rather than fighting their choice indefinitely.
   useEffect(() => {
+    if (!autoAdvance || figures.length <= 1) return;
     const timer = setInterval(() => {
-      setIndex((i) => (i + 1) % FIGURES.length);
+      setIndex((i) => (i + 1) % figures.length);
       setActiveKey(null);
     }, AUTO_ADVANCE_MS);
     return () => clearInterval(timer);
-  }, []);
+  }, [autoAdvance, figures.length]);
 
   function goTo(i: number) {
     setIndex(i);
     setActiveKey(null);
   }
 
+  const points = figure.points
+    ? (Object.keys(figure.points) as MeasurementKey[]).filter((k) => figure.points![k] != null)
+    : [];
+
   return (
     <div className="measurement-showcase">
-      <div className="showcase-toggle">
-        {FIGURES.map((f, i) => (
-          <button
-            key={f.key}
-            className={i === index ? 'on' : ''}
-            onClick={() => goTo(i)}
-            type="button"
-          >
-            {f.label}
-          </button>
-        ))}
-      </div>
+      {figures.length > 1 && (
+        <div className="showcase-toggle">
+          {figures.map((f, i) => (
+            <button
+              key={f.key}
+              className={i === index ? 'on' : ''}
+              onClick={() => goTo(i)}
+              type="button"
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="showcase-figure">
         {figure.image ? (
@@ -91,9 +85,9 @@ export default function MeasurementShowcase() {
           </div>
         )}
 
-        {figure.points && (
+        {points.length > 0 && (
           <div className="showcase-lines">
-            {(Object.keys(figure.points) as MeasurementKey[]).map((key) => (
+            {points.map((key) => (
               <div
                 key={key}
                 className={`showcase-line ${activeKey === key ? 'active' : ''}`}
@@ -103,19 +97,18 @@ export default function MeasurementShowcase() {
           </div>
         )}
 
-        {figure.points &&
-          (Object.keys(figure.points) as MeasurementKey[]).map((key) => (
-            <button
-              key={key}
-              type="button"
-              className={`showcase-pill ${activeKey === key ? 'active' : ''}`}
-              style={{ top: `${figure.points![key]}%` }}
-              onMouseEnter={() => setActiveKey(key)}
-              onClick={() => setActiveKey(key)}
-            >
-              {MEASUREMENT_META[key].label.toUpperCase()}
-            </button>
-          ))}
+        {points.map((key) => (
+          <button
+            key={key}
+            type="button"
+            className={`showcase-pill ${activeKey === key ? 'active' : ''}`}
+            style={{ top: `${figure.points![key]}%` }}
+            onMouseEnter={() => setActiveKey(key)}
+            onClick={() => setActiveKey(key)}
+          >
+            {measurementMeta[key].label.toUpperCase()}
+          </button>
+        ))}
       </div>
 
       <div className="showcase-caption">
@@ -123,10 +116,10 @@ export default function MeasurementShowcase() {
           figure.placeholder
         ) : activeKey ? (
           <>
-            <strong>{MEASUREMENT_META[activeKey].label}</strong> — {MEASUREMENT_META[activeKey].desc}
+            <strong>{measurementMeta[activeKey].label}</strong> — {measurementMeta[activeKey].desc}
           </>
         ) : (
-          'Hover or tap a label to see how that measurement is taken.'
+          defaultCaption
         )}
       </div>
     </div>
