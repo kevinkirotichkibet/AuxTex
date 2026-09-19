@@ -155,7 +155,7 @@ select:focus-visible {
 /* ---------- Layout shell ---------- */
 
 .site-main {
-  max-width: 1100px;
+  max-width: 1320px;
   margin: 0 auto;
   padding: 3rem 2.5rem 5rem;
 }
@@ -346,6 +346,12 @@ select:focus-visible {
   grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
   margin-bottom: 4rem;
+  /* The header is sticky (position: sticky; top: 0), so a plain anchor
+     scroll lands this section's top edge exactly under it — the jump
+     from "See how sizing works ↓" looked like it did nothing because the
+     heading was hidden behind the header. This offsets the scroll target
+     by roughly the header's height. */
+  scroll-margin-top: 90px;
 }
 
 .process-step {

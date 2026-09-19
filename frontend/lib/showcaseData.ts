@@ -13,15 +13,15 @@ export const HOMEPAGE_FIGURES: ShowcaseFigure[] = [
   {
     key: 'male',
     label: 'Male',
-    image: null,
-    placeholder: "Male reference photo coming soon — the diagram works the same way once it's added.",
+    image: '/images/figure-male.png',
+    points: { chest: 27, waist: 42, hips: 54 },
   },
   {
     key: 'kids',
     label: 'Kids',
     image: '/images/figure-kids.png',
     placeholder: "Kids' sizing isn't in the catalog yet — this is a preview of what's coming.",
-  },
+  }
 ];
 
 export const HOMEPAGE_MEASUREMENT_META: Record<MeasurementKey, { label: string; desc: string }> = {
