@@ -8,6 +8,10 @@ export class CreateMeasurementDto {
   @IsOptional()
   unit?: string;
 
+  @IsIn(['male', 'female'])
+  @IsOptional()
+  gender?: string;
+
   @IsNumber()
   chest: number;
 

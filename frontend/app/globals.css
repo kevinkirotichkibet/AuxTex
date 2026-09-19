@@ -210,6 +210,135 @@ select:focus-visible {
   padding: 2rem;
 }
 
+/* ---------- Measurement showcase (photo carousel + toggle) ---------- */
+
+.measurement-showcase {
+  text-align: center;
+}
+
+.showcase-toggle {
+  display: inline-flex;
+  background: #e4ebf7;
+  border-radius: 999px;
+  padding: 4px;
+  margin-bottom: 1rem;
+  gap: 4px;
+}
+
+.showcase-toggle button {
+  border: 0;
+  background: transparent;
+  color: var(--ink-muted);
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.45rem 1.1rem;
+  border-radius: 999px;
+  cursor: pointer;
+  width: auto;
+  transition: 0.18s;
+}
+
+.showcase-toggle button.on {
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 2px 8px rgba(40, 70, 120, 0.16);
+}
+
+.showcase-figure {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 512 / 768;
+  min-height: 280px;
+  margin: 0 auto;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #e8ecf5;
+}
+
+.showcase-figure img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.showcase-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.showcase-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.showcase-line {
+  position: absolute;
+  left: 84px;
+  width: 60px;
+  border-top: 2px dashed #2f6fed;
+  transform: translateY(-1px);
+}
+
+.showcase-line.active {
+  border-top-color: #1e54c4;
+  border-top-width: 3px;
+}
+
+.showcase-pill {
+  position: absolute;
+  left: 8px;
+  min-width: 76px;
+  text-align: center;
+  transform: translateY(-50%);
+  background: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #33415a;
+  box-shadow: 0 3px 7px rgba(40, 70, 120, 0.2);
+  cursor: pointer;
+  width: auto;
+  transition: 0.18s;
+}
+
+.showcase-pill:hover,
+.showcase-pill.active {
+  color: #1e54c4;
+}
+
+.showcase-caption {
+  margin-top: 1rem;
+  min-height: 44px;
+  background: #eef3fc;
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.8rem;
+  color: #43536b;
+  text-align: left;
+  line-height: 1.45;
+}
+
+.showcase-caption strong {
+  color: var(--ink);
+}
+
 /* ---------- Process steps ---------- */
 
 .process {

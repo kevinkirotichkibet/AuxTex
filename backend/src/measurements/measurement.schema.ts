@@ -14,6 +14,13 @@ export class MeasurementProfile {
   @Prop({ enum: ['cm', 'in'], default: 'cm' })
   unit: string;
 
+  // Used only to pick which body-shape proportions the fit-preview avatar
+  // renders with (male/female baseline shoulder-waist-hip ratios differ).
+  // Optional and unspecified by default — nothing else in the app depends
+  // on it.
+  @Prop({ enum: ['male', 'female'] })
+  gender?: string;
+
   @Prop({ required: true })
   chest: number;
 

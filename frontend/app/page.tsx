@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api, Product, formatKes } from '@/lib/api';
-import BodySilhouette from './components/BodySilhouette';
+import MeasurementShowcase from './components/MeasurementShowcase';
 
 const CATEGORIES = [
   { value: '', label: 'All' },
@@ -53,7 +53,7 @@ export default function CatalogPage() {
           </div>
         </div>
         <div className="hero-visual">
-          <BodySilhouette />
+          <MeasurementShowcase />
         </div>
       </section>
 

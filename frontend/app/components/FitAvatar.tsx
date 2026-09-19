@@ -1,19 +1,33 @@
-import { Material, MeasurementProfile } from '@/lib/api';
+import { Material } from '@/lib/api';
+
+// Deliberately looser than the full MeasurementProfile type — this needs to
+// work both with a saved profile (product page) and a live draft object
+// built from whatever's currently typed into the measurements form
+// (measurements page), which has no _id yet.
+export type AvatarProfile = {
+  label?: string;
+  gender?: 'male' | 'female';
+  chest?: number;
+  waist?: number;
+  hips?: number;
+};
 
 type Props = {
   material: Material | null;
-  profile: MeasurementProfile | null;
+  profile: AvatarProfile | null;
 };
 
-// Baseline (scale = 1) half-widths, in the SVG's own coordinate space —
-// taken directly from the fixed illustration on the homepage, so this
-// renders identically when no profile is selected yet.
-const REF = { chest: 32, waist: 23, hip: 30 };
-// Neutral reference measurements (cm) that map to scale = 1. These are just
-// a midpoint to scale relative to, not a claim about anyone's "average"
-// body — the point is the avatar visibly widens or narrows relative to
-// this, not that the baseline itself means anything on its own.
-const REF_CM = { chest: 96, waist: 80, hip: 98 };
+// Baseline (scale = 1) half-widths, in the SVG's own coordinate space, and
+// the neutral reference measurements (cm) that map to scale = 1 — one set
+// per gender, since typical shoulder/waist/hip ratios differ, plus a
+// unisex fallback when no gender is set. None of these are claims about
+// anyone's "correct" proportions — they're just the midpoint the avatar
+// scales outward/inward from.
+const PROPORTIONS = {
+  male: { ref: { chest: 34, waist: 22, hip: 28 }, refCm: { chest: 100, waist: 85, hip: 98 } },
+  female: { ref: { chest: 28, waist: 21, hip: 32 }, refCm: { chest: 92, waist: 75, hip: 98 } },
+  unisex: { ref: { chest: 32, waist: 23, hip: 30 }, refCm: { chest: 96, waist: 80, hip: 98 } },
+};
 
 function clampScale(valueCm: number | undefined, refCm: number): number {
   if (!valueCm) return 1;
@@ -29,6 +43,9 @@ function printPatternKind(name: string): 'check' | 'dots' | 'stripe' | null {
 }
 
 export default function FitAvatar({ material, profile }: Props) {
+  const { ref: REF, refCm: REF_CM } =
+    PROPORTIONS[profile?.gender === 'male' || profile?.gender === 'female' ? profile.gender : 'unisex'];
+
   const chestScale = clampScale(profile?.chest, REF_CM.chest);
   const waistScale = clampScale(profile?.waist, REF_CM.waist);
   const hipScale = clampScale(profile?.hips, REF_CM.hip);
@@ -123,7 +140,7 @@ export default function FitAvatar({ material, profile }: Props) {
       </svg>
       <p className="avatar-caption">
         {material
-          ? `Rough preview in ${material.name}${profile ? `, scaled to ${profile.label}` : ''} — a visual guide, not an exact fit.`
+          ? `Rough preview in ${material.name}${profile?.label ? `, scaled to ${profile.label}` : ''} — a visual guide, not an exact fit.`
           : 'Pick a material to preview it here.'}
       </p>
     </div>

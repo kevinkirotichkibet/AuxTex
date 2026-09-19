@@ -5,16 +5,24 @@ import { estimateFromImage, PoseEstimate } from '@/lib/poseEstimate';
 
 type Props = {
   onEstimate: (estimate: PoseEstimate) => void;
+  gender?: '' | 'male' | 'female';
 };
 
-export default function PhotoEstimator({ onEstimate }: Props) {
+export default function PhotoEstimator({ onEstimate, gender: genderProp }: Props) {
   const [open, setOpen] = useState(false);
   const [heightCm, setHeightCm] = useState('');
+  const [localGender, setLocalGender] = useState<'' | 'male' | 'female'>('');
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState<PoseEstimate | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // If the surrounding form already has a gender selected (measurements
+  // page), use that and don't ask again; otherwise let the person set it
+  // here — it only affects the chest/waist/hip approximation slightly, so
+  // it's not required.
+  const gender = genderProp !== undefined ? genderProp : localGender;
 
   async function handleEstimate() {
     if (!file || !heightCm) {
@@ -25,7 +33,7 @@ export default function PhotoEstimator({ onEstimate }: Props) {
     setError('');
     setResult(null);
     try {
-      const estimate = await estimateFromImage(file, Number(heightCm));
+      const estimate = await estimateFromImage(file, Number(heightCm), gender || undefined);
       setResult(estimate);
       drawOverlay(estimate);
     } catch (e: any) {
@@ -89,6 +97,17 @@ export default function PhotoEstimator({ onEstimate }: Props) {
         onChange={(e) => setHeightCm(e.target.value)}
         style={{ marginTop: '0.6rem' }}
       />
+      {genderProp === undefined && (
+        <select
+          value={localGender}
+          onChange={(e) => setLocalGender(e.target.value as '' | 'male' | 'female')}
+          style={{ marginTop: '0.6rem' }}
+        >
+          <option value="">Gender (optional, refines the estimate slightly)</option>
+          <option value="female">Female</option>
+          <option value="male">Male</option>
+        </select>
+      )}
 
       {error && <p className="error">{error}</p>}
 

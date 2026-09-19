@@ -61,6 +61,15 @@ function widthToCircumference(widthCm: number, depthRatio: number): number {
   return Math.PI * (3 * (a + b) - Math.sqrt((3 * a + b) * (a + 3 * b)));
 }
 
+// Depth-ratio midpoints differ slightly by typical build, so an optional
+// gender narrows the guess a little — still a guess either way, not a
+// precise anthropometric claim.
+const DEPTH_RATIOS = {
+  male: { chest: 0.68, waist: 0.72, hip: 0.66 },
+  female: { chest: 0.62, waist: 0.68, hip: 0.72 },
+  unspecified: { chest: 0.65, waist: 0.7, hip: 0.68 },
+};
+
 // Normalizes whatever image the person uploaded into something the model
 // can reliably read. This fixes several real failure modes at once:
 // (1) EXIF-rotated phone photos (createImageBitmap with imageOrientation
@@ -101,6 +110,7 @@ async function normalizeImage(file: File): Promise<HTMLCanvasElement> {
 export async function estimateFromImage(
   file: File,
   actualHeightCm: number,
+  gender?: 'male' | 'female',
 ): Promise<PoseEstimate & { canvas: HTMLCanvasElement }> {
   const canvas = await normalizeImage(file);
   const detector = await getDetector();
@@ -157,9 +167,10 @@ export async function estimateFromImage(
   // between the shoulder and hip width, since it's usually narrower than both.
   const waistWidthCm = ((shoulderWidthCm + hipWidthCm) / 2) * 0.85;
 
-  const chest = widthToCircumference(shoulderWidthCm * 1.05, 0.65);
-  const waist = widthToCircumference(waistWidthCm, 0.7);
-  const hips = widthToCircumference(hipWidthCm, 0.68);
+  const depth = DEPTH_RATIOS[gender ?? 'unspecified'];
+  const chest = widthToCircumference(shoulderWidthCm * 1.05, depth.chest);
+  const waist = widthToCircumference(waistWidthCm, depth.waist);
+  const hips = widthToCircumference(hipWidthCm, depth.hip);
 
   let sleeveLength = 0;
   if (leftWrist && (leftWrist.score ?? 0) >= CONFIDENCE_MIN) {

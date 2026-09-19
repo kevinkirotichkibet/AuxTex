@@ -48,6 +48,7 @@ export type MeasurementProfile = {
   _id: string;
   label: string;
   unit: string;
+  gender?: 'male' | 'female';
   chest: number;
   waist: number;
   hips: number;

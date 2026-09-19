@@ -5,10 +5,12 @@ import { api, MeasurementProfile } from '@/lib/api';
 import { useLoggedIn } from '@/lib/useAuth';
 import PhotoEstimator from '@/app/components/PhotoEstimator';
 import { PoseEstimate } from '@/lib/poseEstimate';
+import FitAvatar from '@/app/components/FitAvatar';
 
 const emptyForm = {
   label: '',
   unit: 'cm',
+  gender: '' as '' | 'male' | 'female',
   chest: '',
   waist: '',
   hips: '',
@@ -34,8 +36,6 @@ export default function MeasurementsPage() {
     if (loggedIn) {
       load();
     } else {
-      // Identity changed (or we're logged out) — never leave a previous
-      // account's profiles on screen.
       setProfiles([]);
     }
   }, [loggedIn]);
@@ -57,6 +57,7 @@ export default function MeasurementsPage() {
       await api.createMeasurementProfile({
         label: form.label,
         unit: form.unit,
+        gender: form.gender || undefined,
         chest: Number(form.chest),
         waist: Number(form.waist),
         hips: Number(form.hips),
@@ -84,6 +85,7 @@ export default function MeasurementsPage() {
           <div key={p._id} className="card">
             <h3>{p.label}</h3>
             <p>
+              {p.gender && `${p.gender === 'male' ? 'Male' : 'Female'} · `}
               Chest {p.chest}{p.unit} · Waist {p.waist}{p.unit} · Hips {p.hips}{p.unit}
             </p>
           </div>
@@ -95,6 +97,7 @@ export default function MeasurementsPage() {
       <p>Save separate profiles for yourself, a partner, or anyone else you tailor for.</p>
 
       <PhotoEstimator
+        gender={form.gender}
         onEstimate={(est: PoseEstimate) =>
           setForm({
             ...form,
@@ -110,73 +113,96 @@ export default function MeasurementsPage() {
         }
       />
 
-      <form onSubmit={handleSubmit}>
-        <input
-          placeholder="Label (e.g. 'My measurements', 'Dad's suit')"
-          value={form.label}
-          onChange={(e) => setForm({ ...form, label: e.target.value })}
-          required
-        />
-        <select value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })}>
-          <option value="cm">Centimeters</option>
-          <option value="in">Inches</option>
-        </select>
-        <input
-          placeholder="Chest"
-          type="number"
-          value={form.chest}
-          onChange={(e) => setForm({ ...form, chest: e.target.value })}
-          required
-        />
-        <input
-          placeholder="Waist"
-          type="number"
-          value={form.waist}
-          onChange={(e) => setForm({ ...form, waist: e.target.value })}
-          required
-        />
-        <input
-          placeholder="Hips"
-          type="number"
-          value={form.hips}
-          onChange={(e) => setForm({ ...form, hips: e.target.value })}
-          required
-        />
-        <input
-          placeholder="Shoulder width (optional)"
-          type="number"
-          value={form.shoulderWidth}
-          onChange={(e) => setForm({ ...form, shoulderWidth: e.target.value })}
-        />
-        <input
-          placeholder="Sleeve length (optional)"
-          type="number"
-          value={form.sleeveLength}
-          onChange={(e) => setForm({ ...form, sleeveLength: e.target.value })}
-        />
-        <input
-          placeholder="Inseam (optional)"
-          type="number"
-          value={form.inseam}
-          onChange={(e) => setForm({ ...form, inseam: e.target.value })}
-        />
-        <input
-          placeholder="Neck (optional)"
-          type="number"
-          value={form.neck}
-          onChange={(e) => setForm({ ...form, neck: e.target.value })}
-        />
-        <input
-          placeholder="Height (optional)"
-          type="number"
-          value={form.height}
-          onChange={(e) => setForm({ ...form, height: e.target.value })}
-        />
-        {error && <p className="error">{error}</p>}
-        <button type="submit" disabled={saving}>
-          {saving ? 'Saving…' : 'Save profile'}
-        </button>
-      </form>
+      <div className="product-layout">
+        <form onSubmit={handleSubmit}>
+          <input
+            placeholder="Label (e.g. 'My measurements', 'Dad's suit')"
+            value={form.label}
+            onChange={(e) => setForm({ ...form, label: e.target.value })}
+            required
+          />
+          <select
+            value={form.gender}
+            onChange={(e) => setForm({ ...form, gender: e.target.value as '' | 'male' | 'female' })}
+          >
+            <option value="">Gender (used for the fit preview shape)</option>
+            <option value="female">Female</option>
+            <option value="male">Male</option>
+          </select>
+          <select value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })}>
+            <option value="cm">Centimeters</option>
+            <option value="in">Inches</option>
+          </select>
+          <input
+            placeholder="Chest"
+            type="number"
+            value={form.chest}
+            onChange={(e) => setForm({ ...form, chest: e.target.value })}
+            required
+          />
+          <input
+            placeholder="Waist"
+            type="number"
+            value={form.waist}
+            onChange={(e) => setForm({ ...form, waist: e.target.value })}
+            required
+          />
+          <input
+            placeholder="Hips"
+            type="number"
+            value={form.hips}
+            onChange={(e) => setForm({ ...form, hips: e.target.value })}
+            required
+          />
+          <input
+            placeholder="Shoulder width (optional)"
+            type="number"
+            value={form.shoulderWidth}
+            onChange={(e) => setForm({ ...form, shoulderWidth: e.target.value })}
+          />
+          <input
+            placeholder="Sleeve length (optional)"
+            type="number"
+            value={form.sleeveLength}
+            onChange={(e) => setForm({ ...form, sleeveLength: e.target.value })}
+          />
+          <input
+            placeholder="Inseam (optional)"
+            type="number"
+            value={form.inseam}
+            onChange={(e) => setForm({ ...form, inseam: e.target.value })}
+          />
+          <input
+            placeholder="Neck (optional)"
+            type="number"
+            value={form.neck}
+            onChange={(e) => setForm({ ...form, neck: e.target.value })}
+          />
+          <input
+            placeholder="Height (optional)"
+            type="number"
+            value={form.height}
+            onChange={(e) => setForm({ ...form, height: e.target.value })}
+          />
+          {error && <p className="error">{error}</p>}
+          <button type="submit" disabled={saving}>
+            {saving ? 'Saving…' : 'Save profile'}
+          </button>
+        </form>
+
+        <div className="avatar-panel">
+          <FitAvatar
+            material={null}
+            profile={{
+              label: form.label || undefined,
+              gender: form.gender || undefined,
+              chest: form.chest ? Number(form.chest) : undefined,
+              waist: form.waist ? Number(form.waist) : undefined,
+              hips: form.hips ? Number(form.hips) : undefined,
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 }
