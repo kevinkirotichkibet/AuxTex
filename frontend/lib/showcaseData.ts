@@ -20,7 +20,7 @@ export const HOMEPAGE_FIGURES: ShowcaseFigure[] = [
     key: 'kids',
     label: 'Kids',
     image: '/images/figure-kids.png',
-    placeholder: "Kids' sizing isn't in the catalog yet — this is a preview of what's coming.",
+    placeholder: "Kids' sizing isn't in the catalog yet. This is a preview of what's coming.",
   }
 ];
 
@@ -56,7 +56,7 @@ export const MEASURE_GUIDE_META: Record<MeasurementKey, { label: string; desc: s
   },
   waist: {
     label: 'Waist',
-    desc: 'Wrap the tape around your natural waistline — the narrowest point, roughly where your body bends side to side.',
+    desc: 'Wrap the tape around your natural waistline, the narrowest point, roughly where your body bends side to side.',
   },
   hips: {
     label: 'Hips',

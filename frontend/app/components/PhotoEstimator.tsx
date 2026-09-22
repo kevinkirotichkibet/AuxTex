@@ -81,7 +81,7 @@ export default function PhotoEstimator({ onEstimate, gender: genderProp }: Props
       <p style={{ fontSize: '0.9rem' }}>
         Your photo is processed entirely in your browser and never uploaded anywhere. Use a
         straight-on, full-body photo against a plain background, arms slightly away from your
-        sides. This gives a <strong>rough starting point</strong> — chest and waist especially
+        sides. This gives a <strong>rough starting point</strong>. Chest and waist especially
         can't be read accurately from a single photo, so review every number before saving.
       </p>
 

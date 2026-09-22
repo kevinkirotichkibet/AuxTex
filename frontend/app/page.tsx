@@ -35,13 +35,13 @@ export default function CatalogPage() {
     <div>
       <section className="hero">
         <div>
-          <span className="eyebrow">Made-to-measure, tailored to you</span>
+          <span className="eyebrow">Made to measure, tailored to you</span>
           <h1>
             The right fit, <em>every time.</em>
           </h1>
           <p className="lede">
-            Choose a garment, pick the fabric it's made from — from classic wool and linen to
-            Maasai shuka and Kitenge prints — and enter your own measurements. Every order is
+            Choose a garment, pick the fabric it's made from, from classic wool and linen to
+            Maasai shuka and Kitenge prints, and enter your own measurements. Every order is
             built to fit one person: you.
           </p>
           <div className="hero-cta-row">
@@ -62,7 +62,7 @@ export default function CatalogPage() {
         <div className="process-step">
           <span className="step-number">01</span>
           <h3>Choose a garment</h3>
-          <p>Suits, shirts, trousers, blazers, dresses, and skirts — each made to order.</p>
+          <p>Suits, shirts, trousers, blazers, dresses, and skirts, each made to order.</p>
         </div>
         <div className="process-step">
           <span className="step-number">02</span>
@@ -72,7 +72,7 @@ export default function CatalogPage() {
         <div className="process-step">
           <span className="step-number">03</span>
           <h3>Enter your measurements</h3>
-          <p>Save a profile for yourself, or estimate one from a photo — either way, editable.</p>
+          <p>Save a profile for yourself, or estimate one from a photo. Either way, editable.</p>
         </div>
       </section>
 

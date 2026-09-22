@@ -32,16 +32,16 @@ async function seed() {
   await ProductModel.deleteMany({});
 
   const materials = await MaterialModel.insertMany([
-    { name: 'Italian Wool - Navy', type: 'wool', color: '#1a2744', pricePerMeter: 4500 },
+    { name: 'Italian Wool Navy', type: 'wool', color: '#1a2744', pricePerMeter: 4500 },
     { name: 'Charcoal Wool Flannel', type: 'wool', color: '#36454f', pricePerMeter: 4200 },
-    { name: 'Egyptian Cotton - White', type: 'cotton', color: '#f5f5f0', pricePerMeter: 1800 },
-    { name: 'Oxford Cotton - Sky Blue', type: 'cotton', color: '#a9c6e8', pricePerMeter: 1600 },
-    { name: 'Irish Linen - Sand', type: 'linen', color: '#e0d3b8', pricePerMeter: 2200 },
-    { name: 'Mulberry Silk - Burgundy', type: 'silk', color: '#6d1f2c', pricePerMeter: 5200 },
-    { name: 'Maasai Shuka - Red Check', type: 'african-print', color: '#b1272c', pricePerMeter: 2800 },
-    { name: 'Kitenge - Sunburst Ankara', type: 'african-print', color: '#e8a33d', pricePerMeter: 2600 },
-    { name: 'Kente-Inspired Weave - Gold/Green', type: 'african-print', color: '#c9a227', pricePerMeter: 3200 },
-    { name: 'Kikoy Stripe - Coastal Blue', type: 'african-print', color: '#2f6690', pricePerMeter: 2000 },
+    { name: 'Egyptian Cotton White', type: 'cotton', color: '#f5f5f0', pricePerMeter: 1800 },
+    { name: 'Oxford Cotton Sky Blue', type: 'cotton', color: '#a9c6e8', pricePerMeter: 1600 },
+    { name: 'Irish Linen Sand', type: 'linen', color: '#e0d3b8', pricePerMeter: 2200 },
+    { name: 'Mulberry Silk Burgundy', type: 'silk', color: '#6d1f2c', pricePerMeter: 5200 },
+    { name: 'Maasai Shuka Red Check', type: 'african-print', color: '#b1272c', pricePerMeter: 2800 },
+    { name: 'Kitenge Sunburst Ankara', type: 'african-print', color: '#e8a33d', pricePerMeter: 2600 },
+    { name: 'Kente Inspired Weave Gold Green', type: 'african-print', color: '#c9a227', pricePerMeter: 3200 },
+    { name: 'Kikoy Stripe Coastal Blue', type: 'african-print', color: '#2f6690', pricePerMeter: 2000 },
   ]);
 
   const byName = Object.fromEntries(materials.map((m) => [m.name, m._id]));
@@ -53,9 +53,9 @@ async function seed() {
       basePrice: 15000,
       description: 'A classic two-piece suit, tailored to your measurements.',
       compatibleMaterials: [
-        byName['Italian Wool - Navy'],
+        byName['Italian Wool Navy'],
         byName['Charcoal Wool Flannel'],
-        byName['Mulberry Silk - Burgundy'],
+        byName['Mulberry Silk Burgundy'],
       ],
     },
     {
@@ -64,9 +64,9 @@ async function seed() {
       basePrice: 9500,
       description: 'A structured single-breasted blazer that pairs with anything.',
       compatibleMaterials: [
-        byName['Italian Wool - Navy'],
+        byName['Italian Wool Navy'],
         byName['Charcoal Wool Flannel'],
-        byName['Irish Linen - Sand'],
+        byName['Irish Linen Sand'],
       ],
     },
     {
@@ -75,9 +75,9 @@ async function seed() {
       basePrice: 4500,
       description: 'A crisp, made-to-measure shirt for work or formal occasions.',
       compatibleMaterials: [
-        byName['Egyptian Cotton - White'],
-        byName['Oxford Cotton - Sky Blue'],
-        byName['Irish Linen - Sand'],
+        byName['Egyptian Cotton White'],
+        byName['Oxford Cotton Sky Blue'],
+        byName['Irish Linen Sand'],
       ],
     },
     {
@@ -86,9 +86,9 @@ async function seed() {
       basePrice: 5500,
       description: 'Flat-front trousers cut precisely to your measurements.',
       compatibleMaterials: [
-        byName['Italian Wool - Navy'],
+        byName['Italian Wool Navy'],
         byName['Charcoal Wool Flannel'],
-        byName['Oxford Cotton - Sky Blue'],
+        byName['Oxford Cotton Sky Blue'],
       ],
     },
     {
@@ -97,9 +97,9 @@ async function seed() {
       basePrice: 7000,
       description: 'A flattering wrap dress made from bold African print fabric.',
       compatibleMaterials: [
-        byName['Kitenge - Sunburst Ankara'],
-        byName['Maasai Shuka - Red Check'],
-        byName['Kente-Inspired Weave - Gold/Green'],
+        byName['Kitenge Sunburst Ankara'],
+        byName['Maasai Shuka Red Check'],
+        byName['Kente Inspired Weave Gold Green'],
       ],
     },
     {
@@ -108,9 +108,9 @@ async function seed() {
       basePrice: 4000,
       description: 'A fitted pencil skirt in vibrant Kitenge print.',
       compatibleMaterials: [
-        byName['Kitenge - Sunburst Ankara'],
-        byName['Kente-Inspired Weave - Gold/Green'],
-        byName['Kikoy Stripe - Coastal Blue'],
+        byName['Kitenge Sunburst Ankara'],
+        byName['Kente Inspired Weave Gold Green'],
+        byName['Kikoy Stripe Coastal Blue'],
       ],
     },
   ]);

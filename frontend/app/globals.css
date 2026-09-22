@@ -505,6 +505,20 @@ form {
   max-width: 420px;
 }
 
+/* A data-entry form with many fields (measurements) benefits from more
+   width and a 2-column grid for the numeric inputs — the default 420px
+   cap (right for a short login/register form) left it looking cramped
+   and unnecessarily tall inside a much wider layout column. */
+.form-wide {
+  max-width: 640px;
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
+
 input,
 select {
   padding: 0.65rem 0.9rem;
@@ -635,6 +649,10 @@ button:disabled {
 }
 
 @media (max-width: 720px) {
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+
   .desktop-nav {
     display: none;
   }

@@ -116,7 +116,7 @@ export async function estimateFromImage(
   const detector = await getDetector();
   const poses = await detector.estimatePoses(canvas);
   if (poses.length === 0) {
-    throw new Error('No person detected in that photo — try a clearer, front-facing full-body shot.');
+    throw new Error('No person detected in that photo. Try a clearer, front-facing full-body shot.');
   }
   const kp = poses[0].keypoints;
 
@@ -146,7 +146,7 @@ export async function estimateFromImage(
       .join(', ');
     throw new Error(
       `Couldn't confidently locate your ${missing.map(([name]) => name).join(', ')} in that photo ` +
-        `(confidence — ${detail}). Try a full-body photo, facing the camera, with even lighting and ` +
+        `(confidence: ${detail}). Try a full-body photo, facing the camera, with even lighting and ` +
         'a plain, non-transparent background.',
     );
   }

@@ -68,7 +68,7 @@ export default function AdminOrdersPage() {
   return (
     <div>
       <div className="section-heading">
-        <h1>Admin — orders</h1>
+        <h1>Admin: orders</h1>
         <Link href="/admin">Manage catalog</Link>
       </div>
 

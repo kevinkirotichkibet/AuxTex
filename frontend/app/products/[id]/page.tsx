@@ -174,7 +174,7 @@ export default function ProductDetailPage() {
       </div>
 
       <div className="avatar-panel">
-        <FitAvatar material={selectedMaterial} profile={selectedProfile} />
+        <FitAvatar material={selectedMaterial} profile={selectedProfile} category={product.category} />
       </div>
     </div>
   );

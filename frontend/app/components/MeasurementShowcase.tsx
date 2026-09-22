@@ -116,7 +116,7 @@ export default function MeasurementShowcase({
           figure.placeholder
         ) : activeKey ? (
           <>
-            <strong>{measurementMeta[activeKey].label}</strong> — {measurementMeta[activeKey].desc}
+            <strong>{measurementMeta[activeKey].label}</strong>. {measurementMeta[activeKey].desc}
           </>
         ) : (
           defaultCaption

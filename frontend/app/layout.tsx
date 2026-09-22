@@ -4,7 +4,7 @@ import Header from './components/Header';
 
 export const metadata: Metadata = {
   title: 'AuxTex Fit',
-  description: 'Made-to-measure garments, tailored to you.',
+  description: 'Made to measure garments, tailored to you.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -22,7 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Header />
         <main className="site-main">{children}</main>
         <footer className="site-footer">
-          <p style={{ margin: 0 }}>AuxTex Fit — made-to-measure garments, cut to your exact shape.</p>
+          <p style={{ margin: 0 }}>AuxTex Fit: made to measure garments, cut to your exact shape.</p>
         </footer>
       </body>
     </html>

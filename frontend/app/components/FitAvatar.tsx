@@ -15,6 +15,12 @@ export type AvatarProfile = {
 type Props = {
   material: Material | null;
   profile: AvatarProfile | null;
+  // The product's category (suit/blazer/shirt/trousers/dress/skirt).
+  // Determines which body regions are actually rendered in the selected
+  // fabric — a blazer doesn't color the legs, a skirt doesn't color the
+  // torso, etc. Omitted (e.g. on the measurements page, where there's no
+  // specific product) falls back to coloring the whole body.
+  category?: string;
 };
 
 // Baseline (scale = 1) half-widths, in the SVG's own coordinate space, and
@@ -29,6 +35,23 @@ const PROPORTIONS = {
   unisex: { ref: { chest: 32, waist: 23, hip: 30 }, refCm: { chest: 96, waist: 80, hip: 98 } },
 };
 
+// What each garment category actually covers. "legs" = the ordinary
+// two-leg silhouette; "dress" = one flared shape from hip to mid-calf, no
+// leg split (a dress covers both legs as one garment); "skirt" = the same
+// flare but knee-length, with bare (neutral) legs showing below it.
+type LowerStyle = 'legs' | 'dress' | 'skirt';
+const GARMENT_CONFIG: Record<string, { upper: boolean; lower: boolean; lowerStyle: LowerStyle }> = {
+  suit: { upper: true, lower: true, lowerStyle: 'legs' },
+  blazer: { upper: true, lower: false, lowerStyle: 'legs' },
+  shirt: { upper: true, lower: false, lowerStyle: 'legs' },
+  trousers: { upper: false, lower: true, lowerStyle: 'legs' },
+  dress: { upper: true, lower: true, lowerStyle: 'dress' },
+  skirt: { upper: false, lower: true, lowerStyle: 'skirt' },
+};
+const DEFAULT_GARMENT = { upper: true, lower: true, lowerStyle: 'legs' as LowerStyle };
+
+const NEUTRAL = '#eef1f6';
+
 function clampScale(valueCm: number | undefined, refCm: number): number {
   if (!valueCm) return 1;
   return Math.min(1.3, Math.max(0.8, valueCm / refCm));
@@ -42,9 +65,10 @@ function printPatternKind(name: string): 'check' | 'dots' | 'stripe' | null {
   return null;
 }
 
-export default function FitAvatar({ material, profile }: Props) {
+export default function FitAvatar({ material, profile, category }: Props) {
   const { ref: REF, refCm: REF_CM } =
     PROPORTIONS[profile?.gender === 'male' || profile?.gender === 'female' ? profile.gender : 'unisex'];
+  const garment = (category && GARMENT_CONFIG[category]) || DEFAULT_GARMENT;
 
   const chestScale = clampScale(profile?.chest, REF_CM.chest);
   const waistScale = clampScale(profile?.waist, REF_CM.waist);
@@ -74,17 +98,38 @@ export default function FitAvatar({ material, profile }: Props) {
 
   const torsoPath = `M${shoulderL},100 Q210,88 ${shoulderR},100 L${waistR},225 Q210,233 ${waistL},225 Z`;
   const hipPath = `M${waistL},225 Q210,233 ${waistR},225 L${hipR},270 Q210,280 ${hipL},270 Z`;
-  const legLeftPath = `M${hipL},270 L${innerL},270 L${innerL - 4},420 L${hipL + 4},420 Z`;
-  const legRightPath = `M${hipR},270 L${innerR},270 L${innerR + 4},420 L${hipR - 4},420 Z`;
-  const footLcx = (hipL + innerL) / 2;
-  const footRcx = (hipR + innerR) / 2;
+
+  function legPaths(topY: number, bottomY: number) {
+    return {
+      left: `M${hipL},${topY} L${innerL},${topY} L${innerL - 4},${bottomY} L${hipL + 4},${bottomY} Z`,
+      right: `M${hipR},${topY} L${innerR},${topY} L${innerR + 4},${bottomY} L${hipR - 4},${bottomY} Z`,
+    };
+  }
+  const fullLegs = legPaths(270, 420);
+
+  // Dress: one flared shape, no leg split — covers both legs as a single
+  // garment. Skirt: the same flare, shorter (knee-length), with bare
+  // (neutral) legs showing below it down to the ankle.
+  const dressHemL = hipL - 25;
+  const dressHemR = hipR + 25;
+  const dressHemY = 400;
+  const dressPath = `M${hipL},270 L${hipR},270 L${dressHemR},${dressHemY} L${dressHemL},${dressHemY} Z`;
+
+  const skirtHemL = hipL - 18;
+  const skirtHemR = hipR + 18;
+  const skirtHemY = 335;
+  const skirtPath = `M${hipL},270 L${hipR},270 L${skirtHemR},${skirtHemY} L${skirtHemL},${skirtHemY} Z`;
+  const bareLegs = legPaths(335, 420);
 
   const patternKind = material ? printPatternKind(material.name) : null;
   const hasPhoto = !!material?.images?.[0];
   const fillColor = material?.color ?? '#d7e1f7';
   const patternId = 'avatar-fabric-pattern';
   const usePattern = hasPhoto || patternKind;
-  const fill = usePattern ? `url(#${patternId})` : fillColor;
+  const fabricFill = usePattern ? `url(#${patternId})` : fillColor;
+
+  const upperFill = garment.upper ? fabricFill : NEUTRAL;
+  const lowerFill = garment.lower ? fabricFill : NEUTRAL;
 
   return (
     <div>
@@ -121,9 +166,10 @@ export default function FitAvatar({ material, profile }: Props) {
           )}
         </defs>
 
-        <g fill={fill} stroke="#c7cfdc" strokeWidth="0.5">
-          <circle cx="210" cy="55" r="27" fill="#e8ecf5" stroke="none" />
-          <rect x="200" y="79" width="20" height="14" fill="#e8ecf5" stroke="none" />
+        <circle cx="210" cy="55" r="27" fill="#e8ecf5" />
+        <rect x="200" y="79" width="20" height="14" fill="#e8ecf5" />
+
+        <g fill={upperFill} stroke="#c7cfdc" strokeWidth="0.5">
           <path d={torsoPath} />
           <path
             d={`M${180 + armShiftL},104 C${158 + armShiftL},128 ${146 + armShiftL},168 ${145 + armShiftL},215 L${162 + armShiftL},218 C${165 + armShiftL},175 ${178 + armShiftL},138 ${198 + armShiftL},112 Z`}
@@ -131,16 +177,56 @@ export default function FitAvatar({ material, profile }: Props) {
           <path
             d={`M${240 + armShiftR},104 C${262 + armShiftR},128 ${274 + armShiftR},168 ${275 + armShiftR},215 L${258 + armShiftR},218 C${255 + armShiftR},175 ${242 + armShiftR},138 ${222 + armShiftR},112 Z`}
           />
-          <path d={hipPath} />
-          <path d={legLeftPath} />
-          <path d={legRightPath} />
-          <ellipse cx={footLcx} cy="428" rx="10" ry="8" />
-          <ellipse cx={footRcx} cy="428" rx="10" ry="8" />
+        </g>
+
+        {garment.lowerStyle === 'legs' && (
+          <g fill={lowerFill} stroke="#c7cfdc" strokeWidth="0.5">
+            <path d={hipPath} />
+            <path d={fullLegs.left} />
+            <path d={fullLegs.right} />
+          </g>
+        )}
+
+        {garment.lowerStyle === 'dress' && (
+          <g fill={lowerFill} stroke="#c7cfdc" strokeWidth="0.5">
+            <path d={hipPath} />
+            <path d={dressPath} />
+          </g>
+        )}
+
+        {garment.lowerStyle === 'skirt' && (
+          <>
+            <g fill={NEUTRAL} stroke="#c7cfdc" strokeWidth="0.5">
+              <path d={hipPath} />
+            </g>
+            <g fill={lowerFill} stroke="#c7cfdc" strokeWidth="0.5">
+              <path d={skirtPath} />
+            </g>
+            <g fill={NEUTRAL} stroke="#c7cfdc" strokeWidth="0.5">
+              <path d={bareLegs.left} />
+              <path d={bareLegs.right} />
+            </g>
+          </>
+        )}
+
+        <g fill={NEUTRAL} stroke="#c7cfdc" strokeWidth="0.5">
+          {garment.lowerStyle === 'legs' && (
+            <>
+              <ellipse cx={(hipL + innerL) / 2} cy="428" rx="10" ry="8" />
+              <ellipse cx={(hipR + innerR) / 2} cy="428" rx="10" ry="8" />
+            </>
+          )}
+          {garment.lowerStyle !== 'legs' && (
+            <>
+              <ellipse cx={cx - 12} cy="428" rx="10" ry="8" />
+              <ellipse cx={cx + 12} cy="428" rx="10" ry="8" />
+            </>
+          )}
         </g>
       </svg>
       <p className="avatar-caption">
         {material
-          ? `Rough preview in ${material.name}${profile?.label ? `, scaled to ${profile.label}` : ''} — a visual guide, not an exact fit.`
+          ? `Rough preview in ${material.name}${profile?.label ? `, scaled to ${profile.label}` : ''}. A visual guide, not an exact fit.`
           : 'Pick a material to preview it here.'}
       </p>
     </div>

@@ -28,7 +28,7 @@ export default function MeasurementsPage() {
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
-  const [showGuide, setShowGuide] = useState(false);
+  const [showGuide, setShowGuide] = useState(true); // TEMP-TEST
   const loggedIn = useLoggedIn();
 
   function load() {
@@ -46,7 +46,7 @@ export default function MeasurementsPage() {
   if (!loggedIn) {
     return (
       <p>
-        <a href="/login">Log in</a> to manage your measurement profiles — you can save one for
+        <a href="/login">Log in</a> to manage your measurement profiles. You can save one for
         yourself and one for each family member you're ordering for.
       </p>
     );
@@ -104,18 +104,34 @@ export default function MeasurementsPage() {
           How to measure yourself
         </button>
       ) : (
-        <div style={{ border: '1px solid var(--line)', padding: '1.25rem', marginBottom: '1.5rem' }}>
+        <div style={{ border: '1px solid var(--line)', borderRadius: 'var(--radius)', padding: '1.5rem', marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <h3 style={{ marginTop: 0 }}>How to measure yourself</h3>
             <button type="button" onClick={() => setShowGuide(false)} style={{ fontSize: '0.85rem' }}>
               Close
             </button>
           </div>
-          <MeasurementShowcase
-            figures={MEASURE_GUIDE_FIGURES}
-            measurementMeta={MEASURE_GUIDE_META}
-            autoAdvance={false}
-          />
+          <div className="product-layout">
+            <div>
+              <p>
+                A few basics that make a real difference to accuracy, whichever measurement
+                you're taking:
+              </p>
+              <ul style={{ color: 'var(--ink-muted)', lineHeight: 1.8, paddingLeft: '1.2rem' }}>
+                <li>Use a soft cloth tape measure, not a rigid metal one.</li>
+                <li>Measure over light clothing or undergarments, not bulky layers.</li>
+                <li>Keep the tape snug against your body, not pulled tight.</li>
+                <li>Stand naturally, arms relaxed at your sides.</li>
+                <li>Ask someone to help with points you can't see yourself, like your back.</li>
+              </ul>
+              <p>Pick Female or Male on the right to see exactly where each measurement sits.</p>
+            </div>
+            <MeasurementShowcase
+              figures={MEASURE_GUIDE_FIGURES}
+              measurementMeta={MEASURE_GUIDE_META}
+              autoAdvance={false}
+            />
+          </div>
         </div>
       )}
 
@@ -137,76 +153,80 @@ export default function MeasurementsPage() {
       />
 
       <div className="product-layout">
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="form-wide">
           <input
             placeholder="Label (e.g. 'My measurements', 'Dad's suit')"
             value={form.label}
             onChange={(e) => setForm({ ...form, label: e.target.value })}
             required
           />
-          <select
-            value={form.gender}
-            onChange={(e) => setForm({ ...form, gender: e.target.value as '' | 'male' | 'female' })}
-          >
-            <option value="">Gender (used for the fit preview shape)</option>
-            <option value="female">Female</option>
-            <option value="male">Male</option>
-          </select>
-          <select value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })}>
-            <option value="cm">Centimeters</option>
-            <option value="in">Inches</option>
-          </select>
-          <input
-            placeholder="Chest"
-            type="number"
-            value={form.chest}
-            onChange={(e) => setForm({ ...form, chest: e.target.value })}
-            required
-          />
-          <input
-            placeholder="Waist"
-            type="number"
-            value={form.waist}
-            onChange={(e) => setForm({ ...form, waist: e.target.value })}
-            required
-          />
-          <input
-            placeholder="Hips"
-            type="number"
-            value={form.hips}
-            onChange={(e) => setForm({ ...form, hips: e.target.value })}
-            required
-          />
-          <input
-            placeholder="Shoulder width (optional)"
-            type="number"
-            value={form.shoulderWidth}
-            onChange={(e) => setForm({ ...form, shoulderWidth: e.target.value })}
-          />
-          <input
-            placeholder="Sleeve length (optional)"
-            type="number"
-            value={form.sleeveLength}
-            onChange={(e) => setForm({ ...form, sleeveLength: e.target.value })}
-          />
-          <input
-            placeholder="Inseam (optional)"
-            type="number"
-            value={form.inseam}
-            onChange={(e) => setForm({ ...form, inseam: e.target.value })}
-          />
-          <input
-            placeholder="Neck (optional)"
-            type="number"
-            value={form.neck}
-            onChange={(e) => setForm({ ...form, neck: e.target.value })}
-          />
-          <input
-            placeholder="Height (optional)"
-            type="number"
-            value={form.height}
-            onChange={(e) => setForm({ ...form, height: e.target.value })}
-          />
+          <div className="form-grid-2">
+            <select
+              value={form.gender}
+              onChange={(e) => setForm({ ...form, gender: e.target.value as '' | 'male' | 'female' })}
+            >
+              <option value="">Gender (fit preview shape)</option>
+              <option value="female">Female</option>
+              <option value="male">Male</option>
+            </select>
+            <select value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })}>
+              <option value="cm">Centimeters</option>
+              <option value="in">Inches</option>
+            </select>
+          </div>
+          <div className="form-grid-2">
+            <input
+              placeholder="Chest"
+              type="number"
+              value={form.chest}
+              onChange={(e) => setForm({ ...form, chest: e.target.value })}
+              required
+            />
+            <input
+              placeholder="Waist"
+              type="number"
+              value={form.waist}
+              onChange={(e) => setForm({ ...form, waist: e.target.value })}
+              required
+            />
+            <input
+              placeholder="Hips"
+              type="number"
+              value={form.hips}
+              onChange={(e) => setForm({ ...form, hips: e.target.value })}
+              required
+            />
+            <input
+              placeholder="Shoulder width (optional)"
+              type="number"
+              value={form.shoulderWidth}
+              onChange={(e) => setForm({ ...form, shoulderWidth: e.target.value })}
+            />
+            <input
+              placeholder="Sleeve length (optional)"
+              type="number"
+              value={form.sleeveLength}
+              onChange={(e) => setForm({ ...form, sleeveLength: e.target.value })}
+            />
+            <input
+              placeholder="Inseam (optional)"
+              type="number"
+              value={form.inseam}
+              onChange={(e) => setForm({ ...form, inseam: e.target.value })}
+            />
+            <input
+              placeholder="Neck (optional)"
+              type="number"
+              value={form.neck}
+              onChange={(e) => setForm({ ...form, neck: e.target.value })}
+            />
+            <input
+              placeholder="Height (optional)"
+              type="number"
+              value={form.height}
+              onChange={(e) => setForm({ ...form, height: e.target.value })}
+            />
+          </div>
           {error && <p className="error">{error}</p>}
           <button type="submit" disabled={saving}>
             {saving ? 'Saving…' : 'Save profile'}

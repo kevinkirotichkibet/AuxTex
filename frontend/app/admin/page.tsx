@@ -184,7 +184,7 @@ export default function AdminPage() {
   return (
     <div>
       <div className="section-heading">
-        <h1>Admin — manage the catalog</h1>
+        <h1>Admin: manage the catalog</h1>
         <Link href="/admin/orders">View orders</Link>
       </div>
 
@@ -249,7 +249,7 @@ export default function AdminPage() {
         </label>
         <div>
           <label style={{ fontSize: '0.9rem', color: 'var(--ink-muted)', display: 'block', marginBottom: '0.3rem' }}>
-            Fabric photo (optional, but recommended for prints — a real photo beats a guessed pattern)
+            Fabric photo (optional, but recommended for prints. A real photo beats a guessed pattern)
           </label>
           <input type="file" accept="image/*" onChange={handlePhotoSelect} />
           {mPhotoError && <p className="error">{mPhotoError}</p>}
