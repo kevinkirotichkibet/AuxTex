@@ -51,6 +51,7 @@ const GARMENT_CONFIG: Record<string, { upper: boolean; lower: boolean; lowerStyl
 const DEFAULT_GARMENT = { upper: true, lower: true, lowerStyle: 'legs' as LowerStyle };
 
 const NEUTRAL = '#eef1f6';
+const SHADE_ID = 'avatar-volume-shade';
 
 function clampScale(valueCm: number | undefined, refCm: number): number {
   if (!valueCm) return 1;
@@ -63,6 +64,23 @@ function printPatternKind(name: string): 'check' | 'dots' | 'stripe' | null {
   if (n.includes('kitenge') || n.includes('ankara') || n.includes('kente')) return 'dots';
   if (n.includes('kikoy')) return 'stripe';
   return null;
+}
+
+// Every body-part shape is drawn twice: once in its actual fill (fabric or
+// neutral), then a second time in the same outline filled with a diagonal
+// white-to-transparent-to-black gradient at low, plain (non-blended)
+// opacity. Plain alpha compositing — not mix-blend-mode — is used
+// deliberately, since it degrades gracefully in any SVG renderer rather
+// than silently doing nothing in ones that don't support blend modes.
+// That's what turns a flat, single-color silhouette into something that
+// reads as having actual volume.
+function Shaded({ d, fill }: { d: string; fill: string }) {
+  return (
+    <>
+      <path d={d} fill={fill} stroke="#c7cfdc" strokeWidth="0.5" />
+      <path d={d} fill={`url(#${SHADE_ID})`} stroke="none" />
+    </>
+  );
 }
 
 export default function FitAvatar({ material, profile, category }: Props) {
@@ -82,22 +100,17 @@ export default function FitAvatar({ material, profile, category }: Props) {
   const hipL = cx - REF.hip * hipScale;
   const hipR = cx + REF.hip * hipScale;
 
-  // Arms slide outward/inward as one piece with the shoulder, rather than
-  // trying to re-derive a continuously-joined curve — simpler, and avoids
-  // introducing kinks in the arm shape at extreme scales.
   const armShiftL = shoulderL - 180;
   const armShiftR = shoulderR - 240;
 
-  // A fixed half-gap between the legs' inner edges, independent of hip
-  // scale — without this, a narrow hip measurement could shrink the two
-  // legs' shapes into each other (verified: they visibly crossed/merged
-  // before this was pinned down).
   const GAP = 8;
   const innerL = cx - GAP;
   const innerR = cx + GAP;
 
   const torsoPath = `M${shoulderL},100 Q210,88 ${shoulderR},100 L${waistR},225 Q210,233 ${waistL},225 Z`;
   const hipPath = `M${waistL},225 Q210,233 ${waistR},225 L${hipR},270 Q210,280 ${hipL},270 Z`;
+  const armLPath = `M${180 + armShiftL},104 C${158 + armShiftL},128 ${146 + armShiftL},168 ${145 + armShiftL},215 L${162 + armShiftL},218 C${165 + armShiftL},175 ${178 + armShiftL},138 ${198 + armShiftL},112 Z`;
+  const armRPath = `M${240 + armShiftR},104 C${262 + armShiftR},128 ${274 + armShiftR},168 ${275 + armShiftR},215 L${258 + armShiftR},218 C${255 + armShiftR},175 ${242 + armShiftR},138 ${222 + armShiftR},112 Z`;
 
   function legPaths(topY: number, bottomY: number) {
     return {
@@ -107,18 +120,13 @@ export default function FitAvatar({ material, profile, category }: Props) {
   }
   const fullLegs = legPaths(270, 420);
 
-  // Dress: one flared shape, no leg split — covers both legs as a single
-  // garment. Skirt: the same flare, shorter (knee-length), with bare
-  // (neutral) legs showing below it down to the ankle.
   const dressHemL = hipL - 25;
   const dressHemR = hipR + 25;
-  const dressHemY = 400;
-  const dressPath = `M${hipL},270 L${hipR},270 L${dressHemR},${dressHemY} L${dressHemL},${dressHemY} Z`;
+  const dressPath = `M${hipL},270 L${hipR},270 L${dressHemR},400 L${dressHemL},400 Z`;
 
   const skirtHemL = hipL - 18;
   const skirtHemR = hipR + 18;
-  const skirtHemY = 335;
-  const skirtPath = `M${hipL},270 L${hipR},270 L${skirtHemR},${skirtHemY} L${skirtHemL},${skirtHemY} Z`;
+  const skirtPath = `M${hipL},270 L${hipR},270 L${skirtHemR},335 L${skirtHemL},335 Z`;
   const bareLegs = legPaths(335, 420);
 
   const patternKind = material ? printPatternKind(material.name) : null;
@@ -131,6 +139,16 @@ export default function FitAvatar({ material, profile, category }: Props) {
   const upperFill = garment.upper ? fabricFill : NEUTRAL;
   const lowerFill = garment.lower ? fabricFill : NEUTRAL;
 
+  let footLcx: number;
+  let footRcx: number;
+  if (garment.lowerStyle === 'legs') {
+    footLcx = (hipL + innerL) / 2;
+    footRcx = (hipR + innerR) / 2;
+  } else {
+    footLcx = cx - 12;
+    footRcx = cx + 12;
+  }
+
   return (
     <div>
       <svg
@@ -141,6 +159,14 @@ export default function FitAvatar({ material, profile, category }: Props) {
         aria-label="A rough preview of the fit, in the selected fabric"
       >
         <defs>
+          <linearGradient id={SHADE_ID} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.3" />
+            <stop offset="50%" stopColor="#ffffff" stopOpacity="0" />
+            <stop offset="100%" stopColor="#000000" stopOpacity="0.32" />
+          </linearGradient>
+          <filter id="avatar-ground-blur" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="6" />
+          </filter>
           {hasPhoto && (
             <pattern id={patternId} patternUnits="objectBoundingBox" width="1" height="1">
               <image href={material!.images[0]} x="0" y="0" width="420" height="460" preserveAspectRatio="xMidYMid slice" />
@@ -166,63 +192,46 @@ export default function FitAvatar({ material, profile, category }: Props) {
           )}
         </defs>
 
-        <circle cx="210" cy="55" r="27" fill="#e8ecf5" />
-        <rect x="200" y="79" width="20" height="14" fill="#e8ecf5" />
+        {/* Grounding shadow, drawn first so the figure sits on top of it */}
+        <ellipse cx="210" cy="434" rx="65" ry="9" fill="#1c1a17" opacity="0.14" filter="url(#avatar-ground-blur)" />
 
-        <g fill={upperFill} stroke="#c7cfdc" strokeWidth="0.5">
-          <path d={torsoPath} />
-          <path
-            d={`M${180 + armShiftL},104 C${158 + armShiftL},128 ${146 + armShiftL},168 ${145 + armShiftL},215 L${162 + armShiftL},218 C${165 + armShiftL},175 ${178 + armShiftL},138 ${198 + armShiftL},112 Z`}
-          />
-          <path
-            d={`M${240 + armShiftR},104 C${262 + armShiftR},128 ${274 + armShiftR},168 ${275 + armShiftR},215 L${258 + armShiftR},218 C${255 + armShiftR},175 ${242 + armShiftR},138 ${222 + armShiftR},112 Z`}
-          />
-        </g>
+        <circle cx="210" cy="55" r="27" fill="#e8ecf5" />
+        <circle cx="210" cy="55" r="27" fill={`url(#${SHADE_ID})`} />
+        <rect x="200" y="79" width="20" height="14" fill="#e8ecf5" />
+        <rect x="200" y="79" width="20" height="14" fill={`url(#${SHADE_ID})`} />
+
+        <Shaded d={torsoPath} fill={upperFill} />
+        <Shaded d={armLPath} fill={upperFill} />
+        <Shaded d={armRPath} fill={upperFill} />
 
         {garment.lowerStyle === 'legs' && (
-          <g fill={lowerFill} stroke="#c7cfdc" strokeWidth="0.5">
-            <path d={hipPath} />
-            <path d={fullLegs.left} />
-            <path d={fullLegs.right} />
-          </g>
+          <>
+            <Shaded d={hipPath} fill={lowerFill} />
+            <Shaded d={fullLegs.left} fill={lowerFill} />
+            <Shaded d={fullLegs.right} fill={lowerFill} />
+          </>
         )}
 
         {garment.lowerStyle === 'dress' && (
-          <g fill={lowerFill} stroke="#c7cfdc" strokeWidth="0.5">
-            <path d={hipPath} />
-            <path d={dressPath} />
-          </g>
+          <>
+            <Shaded d={hipPath} fill={lowerFill} />
+            <Shaded d={dressPath} fill={lowerFill} />
+          </>
         )}
 
         {garment.lowerStyle === 'skirt' && (
           <>
-            <g fill={NEUTRAL} stroke="#c7cfdc" strokeWidth="0.5">
-              <path d={hipPath} />
-            </g>
-            <g fill={lowerFill} stroke="#c7cfdc" strokeWidth="0.5">
-              <path d={skirtPath} />
-            </g>
-            <g fill={NEUTRAL} stroke="#c7cfdc" strokeWidth="0.5">
-              <path d={bareLegs.left} />
-              <path d={bareLegs.right} />
-            </g>
+            <Shaded d={hipPath} fill={NEUTRAL} />
+            <Shaded d={skirtPath} fill={lowerFill} />
+            <Shaded d={bareLegs.left} fill={NEUTRAL} />
+            <Shaded d={bareLegs.right} fill={NEUTRAL} />
           </>
         )}
 
-        <g fill={NEUTRAL} stroke="#c7cfdc" strokeWidth="0.5">
-          {garment.lowerStyle === 'legs' && (
-            <>
-              <ellipse cx={(hipL + innerL) / 2} cy="428" rx="10" ry="8" />
-              <ellipse cx={(hipR + innerR) / 2} cy="428" rx="10" ry="8" />
-            </>
-          )}
-          {garment.lowerStyle !== 'legs' && (
-            <>
-              <ellipse cx={cx - 12} cy="428" rx="10" ry="8" />
-              <ellipse cx={cx + 12} cy="428" rx="10" ry="8" />
-            </>
-          )}
-        </g>
+        <ellipse cx={footLcx} cy="428" rx="10" ry="8" fill={NEUTRAL} />
+        <ellipse cx={footLcx} cy="428" rx="10" ry="8" fill={`url(#${SHADE_ID})`} />
+        <ellipse cx={footRcx} cy="428" rx="10" ry="8" fill={NEUTRAL} />
+        <ellipse cx={footRcx} cy="428" rx="10" ry="8" fill={`url(#${SHADE_ID})`} />
       </svg>
       <p className="avatar-caption">
         {material
