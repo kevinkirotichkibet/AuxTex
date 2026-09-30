@@ -23,6 +23,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main className="site-main">{children}</main>
         <footer className="site-footer">
           <p style={{ margin: 0 }}>AuxTex Fit: made to measure garments, cut to your exact shape.</p>
+          <p style={{ margin: '0.35rem 0 0', fontSize: '0.75rem', opacity: 0.7 }}>
+            3D model &ldquo;African Female Rigged with Mouth Morphs&rdquo; by Dale.Nolan, licensed{' '}
+            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">
+              CC BY 4.0
+            </a>
+            .
+          </p>
         </footer>
       </body>
     </html>

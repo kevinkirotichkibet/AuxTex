@@ -599,6 +599,18 @@ button:disabled {
   margin-top: 0.75rem;
 }
 
+.avatar-3d-stage {
+  width: 100%;
+  height: 420px;
+  border-radius: calc(var(--radius) - 6px);
+  overflow: hidden;
+  cursor: grab;
+}
+
+.avatar-3d-stage:active {
+  cursor: grabbing;
+}
+
 .product-layout {
   display: grid;
   grid-template-columns: 1.3fr 1fr;
