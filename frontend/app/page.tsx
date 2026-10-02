@@ -99,11 +99,7 @@ export default function CatalogPage() {
         <div className="product-grid">
           {products.map((p) => (
             <Link key={p._id} href={`/products/${p._id}`} className="card">
-              {p.images?.[0] ? (
-                <img src={p.images[0]} alt={p.name} />
-              ) : (
-                <div className="card-photo-placeholder" aria-hidden="true" />
-              )}
+              {p.images?.[0] && <img src={p.images[0]} alt={p.name} />}
               <h3>{p.name}</h3>
               <p className="price">From {formatKes(p.basePrice)}</p>
             </Link>

@@ -39,7 +39,8 @@ export default function Header() {
     <header className="site-header">
       <div className="site-header-row">
         <Link href="/" className="brand">
-          AuxTex Fit
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.svg" alt="AuxTex Fit" className="brand-logo" />
         </Link>
         <button
           className="menu-toggle"
