@@ -716,11 +716,17 @@ function RealisticFemaleFigure({
   const bodyDiffuse = useDirectTexture(FEMALE_BODY_DIFFUSE_URL);
   const hairDiffuse = useDirectTexture(FEMALE_HAIR_DIFFUSE_URL);
 
-  const { root, dressMesh, bodyMesh, hairMesh } = useMemo(() => {
+  const { root, dressMeshes, bodyMeshes, hairMeshes } = useMemo(() => {
     const cloned = scene.clone(true);
-    let dress: THREE.Mesh | null = null;
-    let body: THREE.Mesh | null = null;
-    let hair: THREE.Mesh | null = null;
+    // Several separate mesh pieces can share one material name — this
+    // asset has three (body, eyes, and the mouth interior) all using
+    // "Bodymat". An earlier version of this kept only the last match per
+    // name and silently left the others — including, it turned out, the
+    // eyes — on the broken, un-textured material. Collecting arrays
+    // instead of single refs so every piece actually gets fixed.
+    const dress: THREE.Mesh[] = [];
+    const body: THREE.Mesh[] = [];
+    const hair: THREE.Mesh[] = [];
     cloned.traverse((obj) => {
       const mesh = obj as THREE.Mesh;
       if (!mesh.isMesh) return;
@@ -730,57 +736,119 @@ function RealisticFemaleFigure({
       if (!mat || Array.isArray(mat)) return;
       if (mat.name === 'Topmat') {
         mesh.material = mat.clone();
-        dress = mesh;
+        dress.push(mesh);
       } else if (mat.name === 'Bodymat') {
         mesh.material = mat.clone();
-        body = mesh;
+        body.push(mesh);
       } else if (mat.name === 'Hairmat') {
         mesh.material = mat.clone();
-        hair = mesh;
+        hair.push(mesh);
       }
     });
-    return { root: cloned, dressMesh: dress, bodyMesh: body, hairMesh: hair };
+    return { root: cloned, dressMeshes: dress, bodyMeshes: body, hairMeshes: hair };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scene]);
 
   useEffect(() => {
-    if (!dressMesh) return;
-    const mat = (dressMesh as THREE.Mesh).material as THREE.MeshStandardMaterial;
-    // This one mesh is the whole dress — it's what "upper" and "lower"
-    // both mean for a one-piece garment, so either flag being on is
-    // enough to apply the fabric.
-    if (garment.upper || garment.lower) {
-      mat.map = dressFabric.map;
-      mat.color.set(dressFabric.map ? '#ffffff' : dressFabric.color);
-    }
-    mat.needsUpdate = true;
-  }, [dressMesh, garment.upper, garment.lower, dressFabric]);
+    dressMeshes.forEach((dressMesh) => {
+      const mat = dressMesh.material as THREE.MeshStandardMaterial;
+      // This one mesh is the whole dress — it's what "upper" and "lower"
+      // both mean for a one-piece garment, so either flag being on is
+      // enough to apply the fabric.
+      if (garment.upper || garment.lower) {
+        mat.map = dressFabric.map;
+        mat.color.set(dressFabric.map ? '#ffffff' : dressFabric.color);
+      }
+      // This is what was making the dress go see-through from behind
+      // when you rotated the view: the garment mesh isn't a fully closed
+      // shell (no separate inner lining surface), and three.js by
+      // default only draws the *front* face of a triangle (material.side
+      // defaults to FrontSide). From an angle where you're looking at
+      // the back of the dress's own outward-facing surface, there was
+      // nothing there to draw — you were seeing straight through to the
+      // body underneath. DoubleSide draws both faces, so there's always
+      // fabric facing you. Forcing transparent off too, since this
+      // should read as solid cloth like the male figure's jacket, not
+      // blended/translucent.
+      mat.side = THREE.DoubleSide;
+      mat.transparent = false;
+      mat.alphaTest = 0;
+      mat.depthWrite = true;
+      mat.depthTest = true;
+      // The dark gap at the shoulder/armhole seam is a new artifact that
+      // showed up exactly when DoubleSide went on: the dress's cap-sleeve
+      // piece has an inner and outer surface nearly touching right there,
+      // and with both faces now drawing, they fight over which one's in
+      // front — polygon offset nudges them apart in depth so one wins
+      // cleanly instead of flickering/gapping.
+      mat.polygonOffset = true;
+      mat.polygonOffsetFactor = 1;
+      mat.polygonOffsetUnits = 1;
+      mat.needsUpdate = true;
+    });
+  }, [dressMeshes, garment.upper, garment.lower, dressFabric]);
 
   useEffect(() => {
-    if (!bodyMesh || !bodyDiffuse) return;
-    const mat = (bodyMesh as THREE.Mesh).material as THREE.MeshStandardMaterial;
-    mat.map = bodyDiffuse;
-    mat.color.set('#ffffff');
-    // The loader's fallback defaults (metalness 1, roughness 1, from the
-    // extension it couldn't parse) still need overriding even once the
-    // texture is fixed, or skin reads as chrome instead of skin.
-    mat.metalness = 0;
-    mat.roughness = 0.55;
-    mat.transparent = true;
-    mat.needsUpdate = true;
-  }, [bodyMesh, bodyDiffuse]);
+    if (!bodyDiffuse) return;
+    bodyMeshes.forEach((bodyMesh) => {
+      const mat = bodyMesh.material as THREE.MeshStandardMaterial;
+      mat.map = bodyDiffuse;
+      mat.color.set('#ffffff');
+      // The loader's fallback defaults (metalness 1, roughness 1, from
+      // the extension it couldn't parse) still need overriding even once
+      // the texture is fixed, or skin reads as chrome instead of skin.
+      mat.metalness = 0;
+      mat.roughness = 0.55;
+      // Same fix as the dress: this mesh isn't a guaranteed-closed shell
+      // (or has some inverted normals from the scan/export), so
+      // FrontSide culling was letting you see straight through the skin
+      // from some angles. DoubleSide draws both faces so there's always
+      // a surface there.
+      mat.side = THREE.DoubleSide;
+      // Solid skin, not blended — same reasoning as the dress above.
+      mat.transparent = false;
+      mat.polygonOffset = true;
+      mat.polygonOffsetFactor = 1;
+      mat.polygonOffsetUnits = 1;
+      // Belt-and-suspenders: the skin texture's own alpha channel has
+      // transparent padding around its UV islands (normal for a texture
+      // atlas), and alphaTest/depthWrite can end up inherited from the
+      // file's original (broken) material state depending on load order.
+      // Forcing all three explicitly closes off any route back to a
+      // see-through result, regardless of what the source set them to.
+      mat.alphaTest = 0;
+      mat.depthWrite = true;
+      mat.depthTest = true;
+      mat.needsUpdate = true;
+    });
+    // bodyMeshes is actually three separate pieces (body, eyes, and the
+    // mouth interior) all sharing the "Bodymat" name — an earlier version
+    // of this only grabbed the last one found and left the other two,
+    // including the eyes, on the old broken material. That's what was
+    // showing through the back of the head.
+  }, [bodyMeshes, bodyDiffuse]);
 
   useEffect(() => {
-    if (!hairMesh || !hairDiffuse) return;
-    const mat = (hairMesh as THREE.Mesh).material as THREE.MeshStandardMaterial;
-    mat.map = hairDiffuse;
-    mat.color.set('#ffffff');
-    mat.metalness = 0;
-    mat.roughness = 0.6;
-    mat.transparent = true;
-    mat.alphaTest = 0.3;
-    mat.needsUpdate = true;
-  }, [hairMesh, hairDiffuse]);
+    if (!hairDiffuse) return;
+    hairMeshes.forEach((hairMesh) => {
+      const mat = hairMesh.material as THREE.MeshStandardMaterial;
+      mat.map = hairDiffuse;
+      mat.color.set('#ffffff');
+      mat.metalness = 0;
+      mat.roughness = 0.6;
+      // Hair cards are thin single planes, not closed shells, so they
+      // need DoubleSide for the same reason the dress did. A hard alpha
+      // cutout (alphaTest, no blending) carves out the actual strand
+      // shapes from the card without the sorting problems blended
+      // transparency causes on overlapping cards.
+      mat.side = THREE.DoubleSide;
+      mat.transparent = false;
+      mat.alphaTest = 0.3;
+      mat.depthWrite = true;
+      mat.depthTest = true;
+      mat.needsUpdate = true;
+    });
+  }, [hairMeshes, hairDiffuse]);
 
   const FACING_Y = 0;
 

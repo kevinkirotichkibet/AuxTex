@@ -110,11 +110,15 @@ export default function ProductDetailPage() {
   return (
     <div className="product-layout">
       <div>
-        <img
-          src={product.images?.[0] || 'https://placehold.co/700x400'}
-          alt={product.name}
-          style={{ width: '100%', maxHeight: 400, objectFit: 'cover', border: '1px solid var(--line)' }}
-        />
+        {product.images?.[0] ? (
+          <img
+            src={product.images[0]}
+            alt={product.name}
+            style={{ width: '100%', maxHeight: 400, objectFit: 'cover', border: '1px solid var(--line)' }}
+          />
+        ) : (
+          <div className="product-photo-placeholder" aria-hidden="true" />
+        )}
         <h1>{product.name}</h1>
         <p>{product.description}</p>
 
