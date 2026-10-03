@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api, Product, formatKes } from '@/lib/api';
 import MeasurementShowcase from './components/MeasurementShowcase';
+import { TrustAndWhyUs, ClosingCta } from './components/MarketingExtras';
 import { HOMEPAGE_FIGURES, HOMEPAGE_MEASUREMENT_META } from '@/lib/showcaseData';
 
 const CATEGORIES = [
@@ -76,6 +77,8 @@ export default function CatalogPage() {
         </div>
       </section>
 
+      <TrustAndWhyUs />
+
       <section id="catalog">
         <div className="section-heading">
           <h2>The collection</h2>
@@ -109,6 +112,8 @@ export default function CatalogPage() {
           )}
         </div>
       </section>
+
+      <ClosingCta />
     </div>
   );
 }

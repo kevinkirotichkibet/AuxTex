@@ -379,6 +379,91 @@ select:focus-visible {
   margin: 0;
 }
 
+/* ---------- Trust stats band ---------- */
+
+.trust-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.75rem 1.5rem;
+  margin-bottom: 4rem;
+  text-align: center;
+}
+
+.trust-stat-value {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--accent);
+  margin-bottom: 0.3rem;
+}
+
+.trust-stat-label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  max-width: 20ch;
+  margin: 0 auto;
+}
+
+/* ---------- Why AuxTex Fit ---------- */
+
+.why-us {
+  margin-bottom: 4rem;
+}
+
+.why-us-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.why-us-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.75rem;
+}
+
+.why-us-card svg {
+  color: var(--accent);
+  margin-bottom: 0.9rem;
+}
+
+.why-us-card h3 {
+  margin-bottom: 0.4rem;
+}
+
+.why-us-card p {
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* ---------- Closing CTA banner ---------- */
+
+.closing-cta {
+  text-align: center;
+  background: linear-gradient(135deg, #eaf0fd 0%, #f7f9fc 100%);
+  border-radius: 24px;
+  padding: 3rem 2rem;
+  margin-bottom: 4rem;
+}
+
+.closing-cta h2 {
+  margin-bottom: 0.6rem;
+}
+
+.closing-cta p {
+  color: var(--ink-muted);
+  max-width: 46ch;
+  margin: 0 auto 1.5rem;
+}
+
 /* ---------- Category filter tabs ---------- */
 
 .filter-tabs {
@@ -660,6 +745,15 @@ button:disabled {
   .process {
     grid-template-columns: 1fr;
     gap: 2rem;
+  }
+
+  .trust-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+
+  .why-us-grid {
+    grid-template-columns: 1fr;
   }
 }
 
