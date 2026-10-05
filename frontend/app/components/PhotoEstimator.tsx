@@ -54,7 +54,7 @@ export default function PhotoEstimator({ onEstimate, gender: genderProp }: Props
     const ctx = displayCanvas.getContext('2d');
     if (!ctx) return;
     ctx.drawImage(source, 0, 0, displayCanvas.width, displayCanvas.height);
-    ctx.fillStyle = '#2f6fed';
+    ctx.fillStyle = '#c48a2e';
     for (const kp of estimate.keypoints) {
       if (kp.score < 0.2) continue;
       ctx.beginPath();

@@ -1,19 +1,37 @@
+/* Palette grounded in the actual product: indigo-dyed cloth and wax-print
+   gold, rather than a generic SaaS blue. Warm neutrals throughout (paper,
+   not cool gray) to sit alongside the African prints in the catalog
+   without fighting them. */
 :root {
-  --bg: #f7f9fc;
-  --panel: #ffffff;
-  --ink: #12151c;
-  --ink-muted: #5b6472;
-  --accent: #2f6fed;
-  --accent-dark: #1e54c4;
-  --eyebrow: #16a34a;
-  --line: #e4e8f0;
-  --line-strong: #c7cfdc;
-  --error: #c0362c;
+  --paper: #f5f0e3;
+  --panel: #fffcf5;
+  --ink: #241a10;
+  --ink-muted: #6e6049;
+  --indigo: #1c2b45;
+  --indigo-soft: #2a3c5c;
+  --gold: #bd8a2e;
+  --gold-deep: #96691e;
+  /* The two above are for fills, borders and large display numerals —
+     at body-text size on --paper they fall short of AA contrast
+     (~2.7:1 and ~4.4:1). These two are for actual text/links. */
+  --gold-text: #8a5f1c;
+  --gold-bright: #d9a846;
+  --brick: #a1402a;
+  --line: #e2d7bf;
+  --line-strong: #cbb98f;
+  --error: #a1402a;
+
+  /* Kept as an alias so nothing else needs to change selectors — points
+     at the new gold rather than the old blue. */
+  --bg: var(--paper);
+  --accent: var(--gold);
+  --accent-dark: var(--gold-deep);
 
   --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --radius: 14px;
-  --shadow: 0 2px 10px rgba(18, 21, 28, 0.06);
+  --radius: 4px;
+  --radius-pill: 999px;
+  --shadow: none;
 }
 
 * {
@@ -41,15 +59,14 @@ h1, h2, h3 {
   letter-spacing: -0.01em;
 }
 
-h1 { font-size: clamp(2.25rem, 4vw, 3.4rem); }
-h1 em { font-style: italic; color: var(--accent); }
-h2 { font-size: clamp(1.5rem, 2.5vw, 2rem); }
+h1 { font-size: clamp(2.5rem, 4.6vw, 4rem); font-weight: 600; }
+h2 { font-size: clamp(1.6rem, 2.6vw, 2.1rem); }
 h3 { font-size: 1.15rem; font-weight: 600; }
 
 p { color: var(--ink-muted); }
 
 a {
-  color: var(--accent);
+  color: var(--gold-text);
 }
 
 a:focus-visible,
@@ -62,18 +79,19 @@ select:focus-visible {
 
 .eyebrow {
   display: inline-block;
-  color: var(--eyebrow);
-  font-weight: 700;
-  font-size: 0.8rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin-bottom: 0.75rem;
+  background: var(--gold);
+  color: var(--indigo);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--radius);
+  margin-bottom: 1.1rem;
 }
 
 /* ---------- Header ---------- */
 
 .site-header {
-  border-bottom: 1px solid var(--line);
+  border-bottom: 2px solid var(--gold);
   background: var(--panel);
   position: sticky;
   top: 0;
@@ -131,7 +149,7 @@ select:focus-visible {
 
 .site-header nav a:hover {
   color: var(--ink);
-  border-color: var(--accent);
+  border-color: var(--gold);
 }
 
 .nav-logout {
@@ -152,7 +170,7 @@ select:focus-visible {
 .nav-logout:hover {
   background: none;
   color: var(--ink);
-  border-color: var(--accent);
+  border-color: var(--gold);
 }
 
 /* ---------- Layout shell ---------- */
@@ -164,7 +182,7 @@ select:focus-visible {
 }
 
 .site-footer {
-  border-top: 1px solid var(--line);
+  border-top: 2px solid var(--gold);
   padding: 2.5rem;
   text-align: left;
   color: var(--ink-muted);
@@ -173,21 +191,42 @@ select:focus-visible {
 
 /* ---------- Hero ---------- */
 
+/* Full-bleed: breaks out of .site-main's centered max-width so the band
+   spans the whole viewport, with .hero-inner putting content back on the
+   shared 1320px grid. This is the one bold moment on the page — per the
+   design principle of spending boldness in a single place, nothing else
+   on the page uses this dark treatment. */
 .hero {
+  /* indigo-soft rather than plain indigo — the fully-saturated version
+     read as flat and harsh across a whole viewport-width band. */
+  background: var(--indigo-soft);
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  width: 100vw;
+  padding: 4.5rem 2.5rem 4rem;
+  margin-bottom: 4rem;
+  /* Cancels .site-main's own top padding (3rem) so the band sits flush
+     against the header instead of leaving a stray paper-colored gap
+     above it — .hero is always the first thing on the page. */
+  margin-top: -3rem;
+}
+
+.hero-inner {
+  max-width: 1320px;
+  margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 3rem;
   align-items: center;
-  padding-bottom: 3.5rem;
-  margin-bottom: 3.5rem;
 }
 
 .hero h1 {
   max-width: 13ch;
+  color: var(--panel);
 }
 
 .hero p.lede {
-  color: var(--ink-muted);
+  color: #c3cadb;
   font-size: 1.1rem;
   max-width: 46ch;
   margin-bottom: 1.75rem;
@@ -201,16 +240,20 @@ select:focus-visible {
 }
 
 .hero-secondary-link {
-  color: var(--accent);
+  color: var(--gold-bright);
   font-weight: 600;
   font-size: 0.95rem;
   text-decoration: none;
 }
 
 .hero-visual {
-  background: radial-gradient(circle at 60% 30%, #eaf0fd 0%, #f7f9fc 70%);
-  border-radius: 24px;
+  /* Rounded + shadowed so this reads as a card floating above the band,
+     not a flush rectangle pasted onto it edge-to-edge. */
+  background: var(--panel);
+  border-radius: 20px;
   padding: 2rem;
+  border: none;
+  box-shadow: 0 20px 45px rgba(10, 14, 26, 0.35);
 }
 
 /* ---------- Measurement showcase (photo carousel + toggle) ---------- */
@@ -221,7 +264,7 @@ select:focus-visible {
 
 .showcase-toggle {
   display: inline-flex;
-  background: #e4ebf7;
+  background: var(--paper);
   border-radius: 999px;
   padding: 4px;
   margin-bottom: 1rem;
@@ -243,9 +286,9 @@ select:focus-visible {
 }
 
 .showcase-toggle button.on {
-  background: #fff;
+  background: var(--panel);
   color: var(--ink);
-  box-shadow: 0 2px 8px rgba(40, 70, 120, 0.16);
+  box-shadow: 0 1px 4px rgba(36, 26, 16, 0.18);
 }
 
 .showcase-figure {
@@ -257,7 +300,7 @@ select:focus-visible {
   margin: 0 auto;
   border-radius: 16px;
   overflow: hidden;
-  background: #e8ecf5;
+  background: var(--paper);
 }
 
 .showcase-figure img {
@@ -292,12 +335,12 @@ select:focus-visible {
   position: absolute;
   left: 84px;
   width: 60px;
-  border-top: 2px dashed #2f6fed;
+  border-top: 2px dashed var(--gold);
   transform: translateY(-1px);
 }
 
 .showcase-line.active {
-  border-top-color: #1e54c4;
+  border-top-color: var(--gold-deep);
   border-top-width: 3px;
 }
 
@@ -307,15 +350,15 @@ select:focus-visible {
   min-width: 76px;
   text-align: center;
   transform: translateY(-50%);
-  background: #fff;
+  background: var(--panel);
   border: none;
   border-radius: 999px;
   padding: 0.3rem 0.8rem;
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: #33415a;
-  box-shadow: 0 3px 7px rgba(40, 70, 120, 0.2);
+  color: var(--ink-muted);
+  box-shadow: 0 2px 6px rgba(36, 26, 16, 0.22);
   cursor: pointer;
   width: auto;
   transition: 0.18s;
@@ -323,17 +366,17 @@ select:focus-visible {
 
 .showcase-pill:hover,
 .showcase-pill.active {
-  color: #1e54c4;
+  color: var(--gold-deep);
 }
 
 .showcase-caption {
   margin-top: 1rem;
   min-height: 44px;
-  background: #eef3fc;
+  background: var(--paper);
   border-radius: 12px;
   padding: 0.6rem 0.8rem;
   font-size: 0.8rem;
-  color: #43536b;
+  color: var(--ink-muted);
   text-align: left;
   line-height: 1.45;
 }
@@ -364,7 +407,7 @@ select:focus-visible {
 
 .process-step .step-number {
   font-family: var(--font-display);
-  color: var(--accent);
+  color: var(--gold-text);
   font-size: 1.1rem;
   display: block;
   margin-bottom: 0.4rem;
@@ -386,9 +429,8 @@ select:focus-visible {
   grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
   background: var(--panel);
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-strong);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
   padding: 1.75rem 1.5rem;
   margin-bottom: 4rem;
   text-align: center;
@@ -398,7 +440,7 @@ select:focus-visible {
   display: block;
   font-family: var(--font-display);
   font-size: 2rem;
-  color: var(--accent);
+  color: var(--gold-text);
   margin-bottom: 0.3rem;
 }
 
@@ -424,14 +466,13 @@ select:focus-visible {
 
 .why-us-card {
   background: var(--panel);
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-strong);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
   padding: 1.75rem;
 }
 
 .why-us-card svg {
-  color: var(--accent);
+  color: var(--gold-deep);
   margin-bottom: 0.9rem;
 }
 
@@ -446,20 +487,27 @@ select:focus-visible {
 
 /* ---------- Closing CTA banner ---------- */
 
+/* Bookends the page with the same indigo band the hero opens with,
+   rather than a decorative gradient — a deliberate repeat, not a new
+   flourish. Full-bleed the same way .hero is. */
 .closing-cta {
   text-align: center;
-  background: linear-gradient(135deg, #eaf0fd 0%, #f7f9fc 100%);
-  border-radius: 24px;
-  padding: 3rem 2rem;
-  margin-bottom: 4rem;
+  background: var(--indigo-soft);
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  width: 100vw;
+  padding: 3.5rem 2rem;
+  margin-top: 4rem;
+  margin-bottom: 0;
 }
 
 .closing-cta h2 {
+  color: var(--panel);
   margin-bottom: 0.6rem;
 }
 
 .closing-cta p {
-  color: var(--ink-muted);
+  color: #c3cadb;
   max-width: 46ch;
   margin: 0 auto 1.5rem;
 }
@@ -490,9 +538,9 @@ select:focus-visible {
 }
 
 .filter-tab.active {
-  background: var(--ink);
+  background: var(--indigo);
   color: var(--panel);
-  border-color: var(--ink);
+  border-color: var(--indigo);
 }
 
 /* ---------- Product grid & cards ---------- */
@@ -514,28 +562,29 @@ select:focus-visible {
   gap: 1.25rem;
 }
 
+/* Flat and bordered rather than the lift-on-hover shadow-card pattern —
+   the hover state is a change to the card's own border instead of a
+   fake 3D lift, closer to a swing-tag than a SaaS dashboard tile. */
 .card {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
   padding: 1.25rem;
   display: block;
   text-decoration: none;
   color: inherit;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.15s ease;
 }
 
 .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(18, 21, 28, 0.1);
+  border-color: var(--gold-deep);
 }
 
 .card img {
   width: 100%;
   height: 190px;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: calc(var(--radius) - 2px);
   background: var(--line);
   margin-bottom: 0.9rem;
 }
@@ -545,7 +594,7 @@ select:focus-visible {
 }
 
 .card .price {
-  color: var(--accent-dark);
+  color: var(--gold-text);
   font-weight: 600;
 }
 
@@ -619,12 +668,15 @@ select {
 }
 
 input::placeholder {
-  color: #97a1b0;
+  color: #a79a85;
 }
 
+/* --accent-dark (gold-deep) rather than --accent here: white text on
+   plain --gold falls short of AA contrast (~3.1:1); gold-deep clears it
+   (~5:1). */
 button {
   padding: 0.7rem 1.6rem;
-  background: var(--accent);
+  background: var(--accent-dark);
   color: #fff;
   border: none;
   border-radius: 999px;
@@ -637,7 +689,7 @@ button {
 }
 
 button:hover:not(:disabled) {
-  background: var(--accent-dark);
+  background: var(--indigo);
 }
 
 button:disabled {
@@ -675,7 +727,8 @@ button:disabled {
   position: sticky;
   top: 90px;
   align-self: start;
-  background: radial-gradient(circle at 60% 30%, #eaf0fd 0%, #f7f9fc 70%);
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
   border-radius: var(--radius);
   padding: 1.5rem;
   text-align: center;
@@ -690,7 +743,7 @@ button:disabled {
 .avatar-3d-stage {
   width: 100%;
   height: 420px;
-  border-radius: calc(var(--radius) - 6px);
+  border-radius: 2px;
   overflow: hidden;
   cursor: grab;
 }
@@ -732,7 +785,7 @@ button:disabled {
     margin: 0 auto;
   }
 
-  .hero {
+  .hero-inner {
     grid-template-columns: 1fr;
   }
 
@@ -789,6 +842,10 @@ button:disabled {
     padding: 2rem 1.25rem 3rem;
   }
 
+  .hero {
+    margin-top: -2rem;
+  }
+
   .site-header-row {
     padding: 1rem 1.25rem;
   }
@@ -806,6 +863,10 @@ button:disabled {
 @media (max-width: 480px) {
   .site-main {
     padding: 1.5rem 1rem 2.5rem;
+  }
+
+  .hero {
+    margin-top: -1.5rem;
   }
 
   .product-grid,

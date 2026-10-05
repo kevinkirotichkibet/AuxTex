@@ -8,9 +8,9 @@ export default function BodySilhouette() {
       aria-label="Illustration of measurement points on a body outline"
     >
       {/* Dashed connector lines, drawn first so the labels sit on top */}
-      <line x1="72" y1="148" x2="185" y2="148" stroke="#2f6fed" strokeWidth="1.5" strokeDasharray="4 4" />
-      <line x1="72" y1="235" x2="185" y2="235" stroke="#2f6fed" strokeWidth="1.5" strokeDasharray="4 4" />
-      <line x1="72" y1="285" x2="188" y2="285" stroke="#2f6fed" strokeWidth="1.5" strokeDasharray="4 4" />
+      <line x1="72" y1="148" x2="185" y2="148" stroke="#c48a2e" strokeWidth="1.5" strokeDasharray="4 4" />
+      <line x1="72" y1="235" x2="185" y2="235" stroke="#c48a2e" strokeWidth="1.5" strokeDasharray="4 4" />
+      <line x1="72" y1="285" x2="188" y2="285" stroke="#c48a2e" strokeWidth="1.5" strokeDasharray="4 4" />
 
       {/* Body silhouette — simple geometric shapes, not a rendering of any
           existing figure or photo */}

@@ -35,27 +35,27 @@ export default function CatalogPage() {
   return (
     <div>
       <section className="hero">
-        <div>
-          <span className="eyebrow">Made to measure, tailored to you</span>
-          <h1>
-            The right fit, <em>every time.</em>
-          </h1>
-          <p className="lede">
-            Choose a garment, pick the fabric it's made from, from classic wool and linen to
-            Maasai shuka and Kitenge prints, and enter your own measurements. Every order is
-            built to fit one person: you.
-          </p>
-          <div className="hero-cta-row">
-            <a href="#catalog">
-              <button>Browse the collection</button>
-            </a>
-            <a href="#how-it-works" className="hero-secondary-link">
-              See how sizing works ↓
-            </a>
+        <div className="hero-inner">
+          <div>
+            <span className="eyebrow">Made to measure, tailored to you</span>
+            <h1>Cut to fit one person: you.</h1>
+            <p className="lede">
+              Choose a garment, pick the fabric it's made from, from classic wool and linen to
+              Maasai shuka and Kitenge prints, and enter your own measurements. Every order is
+              built to fit one person: you.
+            </p>
+            <div className="hero-cta-row">
+              <a href="#catalog">
+                <button>Browse the collection</button>
+              </a>
+              <a href="#how-it-works" className="hero-secondary-link">
+                See how sizing works ↓
+              </a>
+            </div>
           </div>
-        </div>
-        <div className="hero-visual">
-          <MeasurementShowcase figures={HOMEPAGE_FIGURES} measurementMeta={HOMEPAGE_MEASUREMENT_META} />
+          <div className="hero-visual">
+            <MeasurementShowcase figures={HOMEPAGE_FIGURES} measurementMeta={HOMEPAGE_MEASUREMENT_META} />
+          </div>
         </div>
       </section>
 
