@@ -1,34 +1,35 @@
-/* DIRECTION B — alternate to the indigo/gold version. Second grounding
-   idea from the same subject: forest-dyed cloth and the burnt-red of
-   Maasai shuka, light and editorial rather than a dark band. A
-   "tailor's ticket" motif (monospace numerals/labels) runs throughout
-   as the thing that makes this version distinct, not just a palette
-   swap — no dark hero, no card shadows, no rounded corners anywhere. */
+/* Palette grounded in the actual product: indigo-dyed cloth and wax-print
+   gold, rather than a generic SaaS blue. Warm neutrals throughout (paper,
+   not cool gray) to sit alongside the African prints in the catalog
+   without fighting them. */
 :root {
-  --cream: #f7f1e2;
-  --panel: #fffbf0;
-  --ink: #1c1811;
-  --ink-muted: #675c48;
-  --forest: #24402f;
-  --forest-soft: #335643;
-  --coral: #c3503a;
-  --coral-deep: #9c3d2b;
-  /* --coral alone falls short of AA for body text on --cream (~3.3:1).
-     This is the one for actual text/links. */
-  --coral-text: #8f3826;
-  --line: #ddd2b8;
-  --line-strong: #c7b896;
-  --error: #9c3d2b;
+  --paper: #f5f0e3;
+  --panel: #fffcf5;
+  --ink: #241a10;
+  --ink-muted: #6e6049;
+  --indigo: #1c2b45;
+  --indigo-soft: #2a3c5c;
+  --gold: #bd8a2e;
+  --gold-deep: #96691e;
+  /* The two above are for fills, borders and large display numerals —
+     at body-text size on --paper they fall short of AA contrast
+     (~2.7:1 and ~4.4:1). These two are for actual text/links. */
+  --gold-text: #8a5f1c;
+  --gold-bright: #d9a846;
+  --brick: #a1402a;
+  --line: #e2d7bf;
+  --line-strong: #cbb98f;
+  --error: #a1402a;
 
-  /* Aliased so most of the file below didn't need touching twice. */
-  --bg: var(--cream);
-  --accent: var(--coral);
-  --accent-dark: var(--coral-deep);
+  /* Kept as an alias so nothing else needs to change selectors — points
+     at the new gold rather than the old blue. */
+  --bg: var(--paper);
+  --accent: var(--gold);
+  --accent-dark: var(--gold-deep);
 
   --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
-  --radius: 0px;
+  --radius: 4px;
   --radius-pill: 999px;
   --shadow: none;
 }
@@ -65,7 +66,7 @@ h3 { font-size: 1.15rem; font-weight: 600; }
 p { color: var(--ink-muted); }
 
 a {
-  color: var(--coral-text);
+  color: var(--gold-text);
 }
 
 a:focus-visible,
@@ -76,26 +77,21 @@ select:focus-visible {
   outline-offset: 2px;
 }
 
-/* The "ticket" motif that runs through this version: monospace,
-   uppercase, a simple underline rather than a filled chip — closer to a
-   tailor's tag than a marketing badge. */
 .eyebrow {
   display: inline-block;
-  font-family: var(--font-mono);
-  color: var(--coral-text);
+  background: var(--gold);
+  color: var(--indigo);
   font-weight: 600;
-  font-size: 0.78rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  padding-bottom: 0.3rem;
-  border-bottom: 2px solid var(--coral);
-  margin-bottom: 1.4rem;
+  font-size: 0.85rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--radius);
+  margin-bottom: 1.1rem;
 }
 
 /* ---------- Header ---------- */
 
 .site-header {
-  border-bottom: 2px solid var(--coral);
+  border-bottom: 2px solid var(--gold);
   background: var(--panel);
   position: sticky;
   top: 0;
@@ -153,7 +149,7 @@ select:focus-visible {
 
 .site-header nav a:hover {
   color: var(--ink);
-  border-color: var(--coral);
+  border-color: var(--gold);
 }
 
 .nav-logout {
@@ -174,7 +170,7 @@ select:focus-visible {
 .nav-logout:hover {
   background: none;
   color: var(--ink);
-  border-color: var(--coral);
+  border-color: var(--gold);
 }
 
 /* ---------- Layout shell ---------- */
@@ -186,7 +182,7 @@ select:focus-visible {
 }
 
 .site-footer {
-  border-top: 2px solid var(--coral);
+  border-top: 2px solid var(--gold);
   padding: 2.5rem;
   text-align: left;
   color: var(--ink-muted);
@@ -195,30 +191,42 @@ select:focus-visible {
 
 /* ---------- Hero ---------- */
 
-/* No dark band this time — stays on the page's own cream, with the
-   boldness coming from scale (a very large headline) and the offset
-   double-border frame around the photo instead of a color block. */
+/* Full-bleed: breaks out of .site-main's centered max-width so the band
+   spans the whole viewport, with .hero-inner putting content back on the
+   shared 1320px grid. This is the one bold moment on the page — per the
+   design principle of spending boldness in a single place, nothing else
+   on the page uses this dark treatment. */
 .hero {
-  padding-top: 3.5rem;
-  margin-bottom: 4.5rem;
+  /* indigo-soft rather than plain indigo — the fully-saturated version
+     read as flat and harsh across a whole viewport-width band. */
+  background: var(--indigo-soft);
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  width: 100vw;
+  padding: 4.5rem 2.5rem 4rem;
+  margin-bottom: 4rem;
+  /* Cancels .site-main's own top padding (3rem) so the band sits flush
+     against the header instead of leaving a stray paper-colored gap
+     above it — .hero is always the first thing on the page. */
+  margin-top: -3rem;
 }
 
 .hero-inner {
   max-width: 1320px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 3.5rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
   align-items: center;
 }
 
 .hero h1 {
-  max-width: 11ch;
-  color: var(--ink);
+  max-width: 13ch;
+  color: var(--panel);
 }
 
 .hero p.lede {
-  color: var(--ink-muted);
+  color: #c3cadb;
   font-size: 1.1rem;
   max-width: 46ch;
   margin-bottom: 1.75rem;
@@ -232,37 +240,20 @@ select:focus-visible {
 }
 
 .hero-secondary-link {
-  color: var(--coral-text);
+  color: var(--gold-bright);
   font-weight: 600;
   font-size: 0.95rem;
   text-decoration: none;
 }
 
-/* The offset double-frame: a solid forest square sits behind the photo
-   and peeks out past two edges, like a swing-tag photographed at a
-   slight remove. Deliberately not a shadow/float effect. */
 .hero-visual {
-  position: relative;
-  padding: 0;
-}
-
-.hero-visual::before {
-  content: '';
-  position: absolute;
-  top: 18px;
-  left: 18px;
-  right: -18px;
-  bottom: -18px;
-  background: var(--forest);
-  z-index: 0;
-}
-
-.hero-visual > * {
-  position: relative;
-  z-index: 1;
+  /* Rounded + shadowed so this reads as a card floating above the band,
+     not a flush rectangle pasted onto it edge-to-edge. */
   background: var(--panel);
-  border: 2px solid var(--ink);
-  padding: 1.75rem;
+  border-radius: 20px;
+  padding: 2rem;
+  border: none;
+  box-shadow: 0 20px 45px rgba(10, 14, 26, 0.35);
 }
 
 /* ---------- Measurement showcase (photo carousel + toggle) ---------- */
@@ -273,7 +264,7 @@ select:focus-visible {
 
 .showcase-toggle {
   display: inline-flex;
-  background: var(--cream);
+  background: var(--paper);
   border-radius: 999px;
   padding: 4px;
   margin-bottom: 1rem;
@@ -307,9 +298,9 @@ select:focus-visible {
   aspect-ratio: 512 / 768;
   min-height: 280px;
   margin: 0 auto;
-  border-radius: 0;
+  border-radius: 16px;
   overflow: hidden;
-  background: var(--cream);
+  background: var(--paper);
 }
 
 .showcase-figure img {
@@ -344,12 +335,12 @@ select:focus-visible {
   position: absolute;
   left: 84px;
   width: 60px;
-  border-top: 2px dashed var(--coral);
+  border-top: 2px dashed var(--gold);
   transform: translateY(-1px);
 }
 
 .showcase-line.active {
-  border-top-color: var(--coral-deep);
+  border-top-color: var(--gold-deep);
   border-top-width: 3px;
 }
 
@@ -375,14 +366,14 @@ select:focus-visible {
 
 .showcase-pill:hover,
 .showcase-pill.active {
-  color: var(--coral-deep);
+  color: var(--gold-deep);
 }
 
 .showcase-caption {
   margin-top: 1rem;
   min-height: 44px;
-  background: var(--cream);
-  border-radius: 0;
+  background: var(--paper);
+  border-radius: 12px;
   padding: 0.6rem 0.8rem;
   font-size: 0.8rem;
   color: var(--ink-muted);
@@ -415,9 +406,8 @@ select:focus-visible {
 }
 
 .process-step .step-number {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  color: var(--coral-text);
+  font-family: var(--font-display);
+  color: var(--gold-text);
   font-size: 1.1rem;
   display: block;
   margin-bottom: 0.4rem;
@@ -434,25 +424,23 @@ select:focus-visible {
 
 /* ---------- Trust stats band ---------- */
 
-/* Thin rules top and bottom, no box — a strip of figures rather than a
-   dashboard-stat card. */
 .trust-stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
-  border-top: 1px solid var(--ink);
-  border-bottom: 1px solid var(--ink);
-  padding: 1.75rem 0;
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  padding: 1.75rem 1.5rem;
   margin-bottom: 4rem;
   text-align: center;
 }
 
 .trust-stat-value {
   display: block;
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 1.8rem;
-  color: var(--coral-text);
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--gold-text);
   margin-bottom: 0.3rem;
 }
 
@@ -470,30 +458,21 @@ select:focus-visible {
   margin-bottom: 4rem;
 }
 
-/* Vertical rules between columns instead of three separate boxed
-   cards — a divided editorial spread. */
 .why-us-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0;
+  gap: 2rem;
 }
 
 .why-us-card {
-  padding: 0 2rem;
-  border-left: 1px solid var(--line-strong);
-}
-
-.why-us-card:first-child {
-  border-left: none;
-  padding-left: 0;
-}
-
-.why-us-card:last-child {
-  padding-right: 0;
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  padding: 1.75rem;
 }
 
 .why-us-card svg {
-  color: var(--coral-deep);
+  color: var(--gold-deep);
   margin-bottom: 0.9rem;
 }
 
@@ -508,22 +487,27 @@ select:focus-visible {
 
 /* ---------- Closing CTA banner ---------- */
 
-/* Stays on the page's own cream — echoes the process-step rule motif
-   (thin top border) rather than repeating a color block. */
+/* Bookends the page with the same indigo band the hero opens with,
+   rather than a decorative gradient — a deliberate repeat, not a new
+   flourish. Full-bleed the same way .hero is. */
 .closing-cta {
   text-align: center;
-  border-top: 2px solid var(--ink);
-  padding: 3.5rem 2rem 0;
+  background: var(--indigo-soft);
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  width: 100vw;
+  padding: 3.5rem 2rem;
   margin-top: 4rem;
+  margin-bottom: 0;
 }
 
 .closing-cta h2 {
-  color: var(--ink);
+  color: var(--panel);
   margin-bottom: 0.6rem;
 }
 
 .closing-cta p {
-  color: var(--ink-muted);
+  color: #c3cadb;
   max-width: 46ch;
   margin: 0 auto 1.5rem;
 }
@@ -554,9 +538,9 @@ select:focus-visible {
 }
 
 .filter-tab.active {
-  background: var(--forest);
+  background: var(--indigo);
   color: var(--panel);
-  border-color: var(--forest);
+  border-color: var(--indigo);
 }
 
 /* ---------- Product grid & cards ---------- */
@@ -581,43 +565,36 @@ select:focus-visible {
 /* Flat and bordered rather than the lift-on-hover shadow-card pattern —
    the hover state is a change to the card's own border instead of a
    fake 3D lift, closer to a swing-tag than a SaaS dashboard tile. */
-/* No box at all — an editorial listing rather than a dashboard tile.
-   Separation comes from the image + a thin rule above the price, not a
-   border/shadow around the whole entry. */
 .card {
-  background: none;
-  border: none;
-  padding: 0;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.25rem;
   display: block;
   text-decoration: none;
   color: inherit;
+  transition: border-color 0.15s ease;
 }
 
-.card:hover h3 {
-  color: var(--coral-text);
+.card:hover {
+  border-color: var(--gold-deep);
 }
 
 .card img {
   width: 100%;
   height: 190px;
   object-fit: cover;
-  border-radius: 0;
+  border-radius: calc(var(--radius) - 2px);
   background: var(--line);
   margin-bottom: 0.9rem;
 }
 
 .card h3 {
-  margin-bottom: 0.5rem;
-  transition: color 0.15s ease;
+  margin-bottom: 0.3rem;
 }
 
 .card .price {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid var(--ink);
-  color: var(--coral-text);
+  color: var(--gold-text);
   font-weight: 600;
 }
 
@@ -632,7 +609,7 @@ select:focus-visible {
 
 .swatch {
   border: 1px solid var(--line);
-  border-radius: 0;
+  border-radius: 10px;
   padding: 0.5rem;
   cursor: pointer;
   text-align: left;
@@ -683,7 +660,7 @@ input,
 select {
   padding: 0.65rem 0.9rem;
   border: 1px solid var(--line-strong);
-  border-radius: 0;
+  border-radius: 10px;
   background: var(--panel);
   font-family: var(--font-body);
   font-size: 1rem;
@@ -697,26 +674,22 @@ input::placeholder {
 /* --accent-dark (gold-deep) rather than --accent here: white text on
    plain --gold falls short of AA contrast (~3.1:1); gold-deep clears it
    (~5:1). */
-/* Stamp-like rather than a pill: sharp corners, monospace, tracked-out
-   uppercase — reads as a tailor's ticket, not a SaaS CTA. */
 button {
-  padding: 0.75rem 1.5rem;
+  padding: 0.7rem 1.6rem;
   background: var(--accent-dark);
   color: #fff;
   border: none;
-  border-radius: 0;
+  border-radius: 999px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
-  font-family: var(--font-mono);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-family: var(--font-body);
   width: fit-content;
   transition: background 0.15s ease;
 }
 
 button:hover:not(:disabled) {
-  background: var(--forest);
+  background: var(--indigo);
 }
 
 button:disabled {
@@ -770,7 +743,7 @@ button:disabled {
 .avatar-3d-stage {
   width: 100%;
   height: 420px;
-  border-radius: 0;
+  border-radius: 2px;
   overflow: hidden;
   cursor: grab;
 }
@@ -834,20 +807,6 @@ button:disabled {
 
   .why-us-grid {
     grid-template-columns: 1fr;
-    gap: 2rem;
-  }
-
-  /* The left-rule-between-columns layout doesn't make sense stacked to
-     one column — switch to a top rule between stacked entries instead. */
-  .why-us-card {
-    border-left: none;
-    border-top: 1px solid var(--line-strong);
-    padding: 1.5rem 0 0;
-  }
-
-  .why-us-card:first-child {
-    border-top: none;
-    padding-top: 0;
   }
 }
 
@@ -883,6 +842,10 @@ button:disabled {
     padding: 2rem 1.25rem 3rem;
   }
 
+  .hero {
+    margin-top: -2rem;
+  }
+
   .site-header-row {
     padding: 1rem 1.25rem;
   }
@@ -900,6 +863,10 @@ button:disabled {
 @media (max-width: 480px) {
   .site-main {
     padding: 1.5rem 1rem 2.5rem;
+  }
+
+  .hero {
+    margin-top: -1.5rem;
   }
 
   .product-grid,
