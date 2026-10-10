@@ -40,16 +40,15 @@ export default function CatalogPage() {
             <span className="eyebrow">Made to measure, tailored to you</span>
             <h1>Cut to fit one person: you.</h1>
             <p className="lede">
-              Choose a garment, pick the fabric it's made from, from classic wool and linen to
-              Maasai shuka and Kitenge prints, and enter your own measurements. Every order is
-              built to fit one person: you.
+              Pick a garment, choose your fabric, and enter your measurements. Every order is
+              cut to fit one person: you.
             </p>
             <div className="hero-cta-row">
               <a href="#catalog">
                 <button>Browse the collection</button>
               </a>
               <a href="#how-it-works" className="hero-secondary-link">
-                See how sizing works ↓
+                How sizing works
               </a>
             </div>
           </div>
@@ -61,17 +60,14 @@ export default function CatalogPage() {
 
       <section id="how-it-works" className="process">
         <div className="process-step">
-          <span className="step-number">01</span>
           <h3>Choose a garment</h3>
           <p>Suits, shirts, trousers, blazers, dresses, and skirts, each made to order.</p>
         </div>
         <div className="process-step">
-          <span className="step-number">02</span>
           <h3>Pick your fabric</h3>
           <p>Wool, cotton, linen, silk, and African prints like Kitenge and Maasai shuka.</p>
         </div>
         <div className="process-step">
-          <span className="step-number">03</span>
           <h3>Enter your measurements</h3>
           <p>Save a profile for yourself, or estimate one from a photo. Either way, editable.</p>
         </div>

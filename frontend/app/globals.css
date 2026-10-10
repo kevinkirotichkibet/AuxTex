@@ -1,37 +1,68 @@
-/* Palette grounded in the actual product: indigo-dyed cloth and wax-print
-   gold, rather than a generic SaaS blue. Warm neutrals throughout (paper,
-   not cool gray) to sit alongside the African prints in the catalog
-   without fighting them. */
+/* DIRECTION C. Built against an external design-taste checklist the user
+   supplied (a public skill file), not a recolor of A or B. The things
+   that actually come from that checklist, concretely:
+     - Serif display type dropped entirely (that checklist specifically
+       names Fraunces as one of the two most overused LLM display serifs
+       — both A and B used it). Archivo (display) + Inter (body) +
+       JetBrains Mono (numerals/labels) instead.
+     - One neutral base (true off-black/off-white, never pure #000/#fff)
+       plus exactly one saturated accent, instead of a two-hue pairing.
+     - Real prefers-color-scheme dark mode with contrast parity, which
+       neither A nor B had at all.
+     - A handful of specific content patterns the checklist calls out
+       as tells were actually present in the existing page and got
+       fixed here, not just restyled: numbered "01/02/03" step labels,
+       a "↓ scroll" cue, and two different buttons both meaning "learn
+       more" (see page.tsx and the process/closing-cta rules below). */
 :root {
-  --paper: #f5f0e3;
-  --panel: #fffcf5;
-  --ink: #241a10;
-  --ink-muted: #6e6049;
-  --indigo: #1c2b45;
-  --indigo-soft: #2a3c5c;
-  --gold: #bd8a2e;
-  --gold-deep: #96691e;
-  /* The two above are for fills, borders and large display numerals —
-     at body-text size on --paper they fall short of AA contrast
-     (~2.7:1 and ~4.4:1). These two are for actual text/links. */
-  --gold-text: #8a5f1c;
-  --gold-bright: #d9a846;
-  --brick: #a1402a;
-  --line: #e2d7bf;
-  --line-strong: #cbb98f;
-  --error: #a1402a;
+  --bg: #f2f1ed;
+  --panel: #fdfdfb;
+  --ink: #15140f;
+  --ink-muted: #5c594f;
+  /* The base accent, same hex in both themes so the brand color never
+     shifts — for borders, large display numerals, and other decorative
+     use where it isn't sitting under text that needs checked contrast. */
+  --accent: #e2402a;
+  /* For accent-colored BACKGROUNDS that hold white/cream text (buttons,
+     the eyebrow chip): ~6.3:1 against white, stable across themes since
+     a button's own fill doesn't depend on page background. */
+  --accent-fill: #b82e1c;
+  /* For accent-colored TEXT/links sitting directly on --bg: --accent
+     itself is only ~3.9:1 there in light mode and fails in dark, so
+     this is redefined per theme below instead. */
+  --accent-text: #b82e1c;
+  --line: #ddd9cf;
+  --line-strong: #c4bfb0;
+  --error: #b82e1c;
 
-  /* Kept as an alias so nothing else needs to change selectors — points
-     at the new gold rather than the old blue. */
-  --bg: var(--paper);
-  --accent: var(--gold);
-  --accent-dark: var(--gold-deep);
-
-  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-display: 'Archivo', 'Arial Narrow', sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --radius: 4px;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* SHAPE LOCK: two tiers, used consistently everywhere rather than one
+     radius applied uniformly or picked ad hoc per element. Buttons and
+     tag-like pills (filter tabs, swatch toggle, eyebrow) are full pill;
+     every container (cards, panels, inputs, images) is near-sharp. */
+  --radius: 2px;
   --radius-pill: 999px;
   --shadow: none;
+}
+
+/* Dark mode: same two neutrals and the same accent redefined, not
+   introduced fresh, so hierarchy that works in light works in dark
+   too — checked separately for contrast rather than assumed to carry
+   over. --accent itself (used for button fills) is deliberately absent
+   here: it's the one value that doesn't change between themes. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #161512;
+    --panel: #1f1d19;
+    --ink: #f1efe9;
+    --ink-muted: #a8a399;
+    --accent-text: #ff6b4d;
+    --line: #332f27;
+    --line-strong: #47423a;
+  }
 }
 
 * {
@@ -53,20 +84,20 @@ body {
 
 h1, h2, h3 {
   font-family: var(--font-display);
-  font-weight: 500;
-  line-height: 1.15;
+  font-weight: 700;
+  line-height: 1.1;
   margin: 0 0 0.5em;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
 }
 
-h1 { font-size: clamp(2.5rem, 4.6vw, 4rem); font-weight: 600; }
+h1 { font-size: clamp(2.5rem, 4.6vw, 4rem); font-weight: 800; }
 h2 { font-size: clamp(1.6rem, 2.6vw, 2.1rem); }
-h3 { font-size: 1.15rem; font-weight: 600; }
+h3 { font-size: 1.1rem; font-weight: 700; }
 
 p { color: var(--ink-muted); }
 
 a {
-  color: var(--gold-text);
+  color: var(--accent-text);
 }
 
 a:focus-visible,
@@ -79,19 +110,22 @@ select:focus-visible {
 
 .eyebrow {
   display: inline-block;
-  background: var(--gold);
-  color: var(--indigo);
+  background: var(--accent-fill);
+  color: #fff;
+  font-family: var(--font-mono);
   font-weight: 600;
-  font-size: 0.85rem;
-  padding: 0.25rem 0.7rem;
-  border-radius: var(--radius);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-pill);
   margin-bottom: 1.1rem;
 }
 
 /* ---------- Header ---------- */
 
 .site-header {
-  border-bottom: 2px solid var(--gold);
+  border-bottom: 2px solid var(--accent);
   background: var(--panel);
   position: sticky;
   top: 0;
@@ -149,7 +183,7 @@ select:focus-visible {
 
 .site-header nav a:hover {
   color: var(--ink);
-  border-color: var(--gold);
+  border-color: var(--accent);
 }
 
 .nav-logout {
@@ -170,7 +204,7 @@ select:focus-visible {
 .nav-logout:hover {
   background: none;
   color: var(--ink);
-  border-color: var(--gold);
+  border-color: var(--accent);
 }
 
 /* ---------- Layout shell ---------- */
@@ -182,7 +216,7 @@ select:focus-visible {
 }
 
 .site-footer {
-  border-top: 2px solid var(--gold);
+  border-top: 2px solid var(--accent);
   padding: 2.5rem;
   text-align: left;
   color: var(--ink-muted);
@@ -191,44 +225,38 @@ select:focus-visible {
 
 /* ---------- Hero ---------- */
 
-/* Full-bleed: breaks out of .site-main's centered max-width so the band
-   spans the whole viewport, with .hero-inner putting content back on the
-   shared 1320px grid. This is the one bold moment on the page — per the
-   design principle of spending boldness in a single place, nothing else
-   on the page uses this dark treatment. */
+/* No color-block band (A and B both used one — this is the thing that
+   needed to be different, not just a different hue). Boldness instead
+   comes from an asymmetric split and oversized type: the photo bleeds
+   to the viewport's right edge while the text column keeps the normal
+   page margin, rather than both columns sitting evenly inside the same
+   centered container. Top padding deliberately stays modest — a hero
+   this tall relative to the viewport reads as filler, not confidence. */
 .hero {
-  /* indigo-soft rather than plain indigo — the fully-saturated version
-     read as flat and harsh across a whole viewport-width band. */
-  background: var(--indigo-soft);
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
-  width: 100vw;
-  padding: 4.5rem 2.5rem 4rem;
+  padding: 3rem 0 4rem 2.5rem;
   margin-bottom: 4rem;
-  /* Cancels .site-main's own top padding (3rem) so the band sits flush
-     against the header instead of leaving a stray paper-colored gap
-     above it — .hero is always the first thing on the page. */
-  margin-top: -3rem;
+  overflow: hidden;
 }
 
 .hero-inner {
   max-width: 1320px;
   margin: 0 auto;
+  margin-right: 0;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 560px) 1fr;
   gap: 3rem;
   align-items: center;
 }
 
 .hero h1 {
-  max-width: 13ch;
-  color: var(--panel);
+  max-width: 11ch;
+  color: var(--ink);
 }
 
 .hero p.lede {
-  color: #c3cadb;
+  color: var(--ink-muted);
   font-size: 1.1rem;
-  max-width: 46ch;
+  max-width: 42ch;
   margin-bottom: 1.75rem;
 }
 
@@ -240,20 +268,21 @@ select:focus-visible {
 }
 
 .hero-secondary-link {
-  color: var(--gold-bright);
+  color: var(--accent-text);
   font-weight: 600;
   font-size: 0.95rem;
   text-decoration: none;
 }
 
+/* Bleeds to the right edge of the viewport — the one asymmetric move
+   that makes this hero read as a considered split rather than two
+   evenly-padded columns. A flat top accent bar is the only graphic
+   flourish; no shadow, no offset frame behind it. */
 .hero-visual {
-  /* Rounded + shadowed so this reads as a card floating above the band,
-     not a flush rectangle pasted onto it edge-to-edge. */
+  margin-right: calc(50% - 50vw);
+  border-top: 6px solid var(--accent);
   background: var(--panel);
-  border-radius: 20px;
-  padding: 2rem;
-  border: none;
-  box-shadow: 0 20px 45px rgba(10, 14, 26, 0.35);
+  padding: 2.5rem 3rem 2.5rem 2.5rem;
 }
 
 /* ---------- Measurement showcase (photo carousel + toggle) ---------- */
@@ -264,7 +293,7 @@ select:focus-visible {
 
 .showcase-toggle {
   display: inline-flex;
-  background: var(--paper);
+  background: var(--bg);
   border-radius: 999px;
   padding: 4px;
   margin-bottom: 1rem;
@@ -300,7 +329,7 @@ select:focus-visible {
   margin: 0 auto;
   border-radius: 16px;
   overflow: hidden;
-  background: var(--paper);
+  background: var(--bg);
 }
 
 .showcase-figure img {
@@ -335,12 +364,12 @@ select:focus-visible {
   position: absolute;
   left: 84px;
   width: 60px;
-  border-top: 2px dashed var(--gold);
+  border-top: 2px dashed var(--accent);
   transform: translateY(-1px);
 }
 
 .showcase-line.active {
-  border-top-color: var(--gold-deep);
+  border-top-color: var(--accent-fill);
   border-top-width: 3px;
 }
 
@@ -366,13 +395,13 @@ select:focus-visible {
 
 .showcase-pill:hover,
 .showcase-pill.active {
-  color: var(--gold-deep);
+  color: var(--accent-text);
 }
 
 .showcase-caption {
   margin-top: 1rem;
   min-height: 44px;
-  background: var(--paper);
+  background: var(--bg);
   border-radius: 12px;
   padding: 0.6rem 0.8rem;
   font-size: 0.8rem;
@@ -405,13 +434,6 @@ select:focus-visible {
   padding-top: 0.9rem;
 }
 
-.process-step .step-number {
-  font-family: var(--font-display);
-  color: var(--gold-text);
-  font-size: 1.1rem;
-  display: block;
-  margin-bottom: 0.4rem;
-}
 
 .process-step h3 {
   margin-bottom: 0.3rem;
@@ -440,7 +462,7 @@ select:focus-visible {
   display: block;
   font-family: var(--font-display);
   font-size: 2rem;
-  color: var(--gold-text);
+  color: var(--accent-text);
   margin-bottom: 0.3rem;
 }
 
@@ -458,10 +480,21 @@ select:focus-visible {
   margin-bottom: 4rem;
 }
 
+/* Weighted, not three equal columns — the first item carries more
+   visual weight than the other two rather than all three competing for
+   identical space. */
 .why-us-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1.6fr 1fr 1fr;
   gap: 2rem;
+}
+
+.why-us-card:first-child h3 {
+  font-size: 1.3rem;
+}
+
+.why-us-card:first-child p {
+  font-size: 1.02rem;
 }
 
 .why-us-card {
@@ -472,7 +505,7 @@ select:focus-visible {
 }
 
 .why-us-card svg {
-  color: var(--gold-deep);
+  color: var(--accent-fill);
   margin-bottom: 0.9rem;
 }
 
@@ -487,29 +520,32 @@ select:focus-visible {
 
 /* ---------- Closing CTA banner ---------- */
 
-/* Bookends the page with the same indigo band the hero opens with,
-   rather than a decorative gradient — a deliberate repeat, not a new
-   flourish. Full-bleed the same way .hero is. */
+/* No repeated color-block band — a plain section between two accent
+   rules, left-aligned like the rest of the page rather than centered
+   (centered CTA blocks are one of the more reliable generic-template
+   tells). Text and button sit side by side on wide screens. */
 .closing-cta {
-  text-align: center;
-  background: var(--indigo-soft);
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
-  width: 100vw;
-  padding: 3.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  text-align: left;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  padding: 2.5rem 0;
   margin-top: 4rem;
-  margin-bottom: 0;
 }
 
 .closing-cta h2 {
-  color: var(--panel);
-  margin-bottom: 0.6rem;
+  color: var(--ink);
+  margin-bottom: 0.4rem;
 }
 
 .closing-cta p {
-  color: #c3cadb;
-  max-width: 46ch;
-  margin: 0 auto 1.5rem;
+  color: var(--ink-muted);
+  max-width: 42ch;
+  margin: 0;
 }
 
 /* ---------- Category filter tabs ---------- */
@@ -538,9 +574,9 @@ select:focus-visible {
 }
 
 .filter-tab.active {
-  background: var(--indigo);
-  color: var(--panel);
-  border-color: var(--indigo);
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
 }
 
 /* ---------- Product grid & cards ---------- */
@@ -577,7 +613,7 @@ select:focus-visible {
 }
 
 .card:hover {
-  border-color: var(--gold-deep);
+  border-color: var(--accent-fill);
 }
 
 .card img {
@@ -594,7 +630,7 @@ select:focus-visible {
 }
 
 .card .price {
-  color: var(--gold-text);
+  color: var(--accent-text);
   font-weight: 600;
 }
 
@@ -668,28 +704,43 @@ select {
 }
 
 input::placeholder {
-  color: #a79a85;
+  color: var(--ink-muted);
+  opacity: 0.7;
 }
 
-/* --accent-dark (gold-deep) rather than --accent here: white text on
-   plain --gold falls short of AA contrast (~3.1:1); gold-deep clears it
-   (~5:1). */
+/* --accent-fill rather than --accent here: white text on plain --accent
+   falls short of AA contrast (~4.2:1); --accent-fill clears it (~6.3:1),
+   and stays the same value in both themes since a button's own fill
+   doesn't depend on page background. Monospace/uppercase matches the
+   eyebrow — the one recurring "ticket" device this version uses instead
+   of a second color. The small scale-down on press is the one bit of
+   motion on an otherwise static control — snappy, not decorative. */
 button {
-  padding: 0.7rem 1.6rem;
-  background: var(--accent-dark);
+  padding: 0.75rem 1.5rem;
+  background: var(--accent-fill);
   color: #fff;
   border: none;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  font-family: var(--font-body);
+  font-family: var(--font-mono);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
   width: fit-content;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, transform 0.1s ease;
 }
 
+/* --accent, not --ink: --ink flips between near-black and near-white
+   across the two themes, which combined with the button's fixed white
+   text would make it unreadable in dark mode on hover. --accent is the
+   one color that's deliberately the same hex in both themes. */
 button:hover:not(:disabled) {
-  background: var(--indigo);
+  background: var(--accent);
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 button:disabled {
@@ -785,14 +836,20 @@ button:disabled {
     margin: 0 auto;
   }
 
+  .hero {
+    padding-left: 1.25rem;
+  }
+
   .hero-inner {
     grid-template-columns: 1fr;
   }
 
+  /* The right-bleed only makes sense next to a text column — stacked
+     on mobile it just becomes a normal full-width image. */
   .hero-visual {
     order: -1;
-    max-width: 320px;
-    margin: 0 auto;
+    margin-right: 0;
+    padding: 1.75rem;
   }
 
   .process {
@@ -842,10 +899,6 @@ button:disabled {
     padding: 2rem 1.25rem 3rem;
   }
 
-  .hero {
-    margin-top: -2rem;
-  }
-
   .site-header-row {
     padding: 1rem 1.25rem;
   }
@@ -863,10 +916,6 @@ button:disabled {
 @media (max-width: 480px) {
   .site-main {
     padding: 1.5rem 1rem 2.5rem;
-  }
-
-  .hero {
-    margin-top: -1.5rem;
   }
 
   .product-grid,

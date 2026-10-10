@@ -44,7 +44,7 @@ export function TrustAndWhyUs() {
         </div>
         <div className="trust-stat">
           <span className="trust-stat-value">100%</span>
-          <span className="trust-stat-label">Cut to order — nothing sits on a shelf</span>
+          <span className="trust-stat-label">Cut to order. Nothing sits on a shelf.</span>
         </div>
         <div className="trust-stat">
           <span className="trust-stat-value">3D</span>
@@ -85,10 +85,14 @@ export function TrustAndWhyUs() {
 export function ClosingCta() {
   return (
     <section className="closing-cta">
-      <h2>Ready to get started?</h2>
-      <p>Pick a garment, choose your fabric, and see it on a real 3D model before you order.</p>
-      <a href="#how-it-works">
-        <button>See how it works</button>
+      <div>
+        <h2>Ready to get started?</h2>
+        <p>Pick a garment, choose your fabric, and see it on a real 3D model before you order.</p>
+      </div>
+      {/* Same label as the hero's primary button, not a third variant of
+          "learn more" — one button, one consistent meaning, used twice. */}
+      <a href="#catalog">
+        <button>Browse the collection</button>
       </a>
     </section>
   );
