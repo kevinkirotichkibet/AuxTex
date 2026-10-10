@@ -235,7 +235,6 @@ select:focus-visible {
 .hero {
   padding: 3rem 0 4rem 2.5rem;
   margin-bottom: 4rem;
-  overflow: hidden;
 }
 
 .hero-inner {
@@ -274,15 +273,17 @@ select:focus-visible {
   text-decoration: none;
 }
 
-/* Bleeds to the right edge of the viewport — the one asymmetric move
-   that makes this hero read as a considered split rather than two
-   evenly-padded columns. A flat top accent bar is the only graphic
-   flourish; no shadow, no offset frame behind it. */
+/* The asymmetric move is the uneven column split itself
+   (minmax(0, 560px) 1fr on .hero-inner, not a 1fr/1fr even grid) — a
+   true edge-to-viewport bleed doesn't work correctly on a grid item
+   (percentages here resolve against the item's own box, not the
+   viewport, so the previous attempt at this corrupted the layout
+   instead of bleeding it). Flat top accent bar is the only flourish;
+   no shadow, no offset frame behind it. */
 .hero-visual {
-  margin-right: calc(50% - 50vw);
   border-top: 6px solid var(--accent);
   background: var(--panel);
-  padding: 2.5rem 3rem 2.5rem 2.5rem;
+  padding: 2.5rem;
 }
 
 /* ---------- Measurement showcase (photo carousel + toggle) ---------- */
@@ -844,11 +845,8 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 
-  /* The right-bleed only makes sense next to a text column — stacked
-     on mobile it just becomes a normal full-width image. */
   .hero-visual {
     order: -1;
-    margin-right: 0;
     padding: 1.75rem;
   }
 
